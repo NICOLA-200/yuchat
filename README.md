@@ -71,10 +71,3 @@ This will launch the Flutter app on your connected device or emulator.
 - `backend/`: Go backend code (create this directory if not present)
 - `android/`, `ios/`, etc.: Platform-specific code
 
-## Contributing
-
-Feel free to contribute by opening issues or pull requests.
-
-## License
-
-This project is licensed under the MIT License.

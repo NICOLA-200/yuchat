@@ -14,7 +14,7 @@ class SignupScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 48),
+                const SizedBox(height: 90),
                 // Logo
                 Column(
                   children: [
@@ -25,17 +25,17 @@ class SignupScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'YUCHAT',
+                      'Continue by creating an account',
                       style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 20,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 18,
                         letterSpacing: 1.5,
                         color: Colors.black,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 100),
                 // Username field
                 TextField(
                   decoration: InputDecoration(

@@ -27,7 +27,7 @@ class LoginScreen extends StatelessWidget {
                     const Text(
                       'Login to continue',
                       style: TextStyle(
-                        fontWeight: FontWeight.w200,
+                        fontWeight: FontWeight.w400,
                         fontSize: 18,
                         letterSpacing: 1.5,
                         color: Colors.black,
@@ -42,14 +42,23 @@ class LoginScreen extends StatelessWidget {
                     hintText: 'Your username',
                     filled: true,
                     fillColor: Colors.transparent,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 16,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.black, width: 1),
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 1,
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.black, width: 1),
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 1,
+                      ),
                     ),
                   ),
                   style: const TextStyle(fontSize: 18),
@@ -62,14 +71,23 @@ class LoginScreen extends StatelessWidget {
                     hintText: 'Your password',
                     filled: true,
                     fillColor: Colors.transparent,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 16,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.black, width: 1),
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 1,
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Colors.black, width: 1),
+                      borderSide: const BorderSide(
+                        color: Colors.black,
+                        width: 1,
+                      ),
                     ),
                   ),
                   style: const TextStyle(fontSize: 18),
@@ -105,14 +123,11 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     const Text(
                       'Don’t  have an account? ',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.black, fontSize: 16),
                     ),
                     GestureDetector(
                       onTap: () {
-                        // TODO: Navigate to signup
+                       Navigator.pushNamed(context, '/signup');
                       },
                       child: const Text(
                         'Sign up',

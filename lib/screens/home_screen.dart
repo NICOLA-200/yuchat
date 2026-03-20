@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:yuchat/screens/login_screen.dart';
+import 'package:yuchat/screens/signup_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -64,7 +66,10 @@ class HomeScreen extends StatelessWidget {
                       elevation: 0,
                     ),
                     onPressed: () {
-                      // TODO: Navigate to signup
+                        Navigator.push(
+                            context,
+                             MaterialPageRoute(builder: (context) => const SignupScreen()),
+                            );
                     },
                     child: const Text('Sign up'),
                   ),
@@ -79,7 +84,10 @@ class HomeScreen extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // TODO: Navigate to login
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const LoginScreen()),
+                              );
                       },
                       child: const Text(
                         'Log in',

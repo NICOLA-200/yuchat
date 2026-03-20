@@ -17,10 +17,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'YuChat',
       debugShowCheckedModeBanner: false,
+        routes: {
+          '/signup': (context) => const SignupScreen(),
+          '/login': (context) => const LoginScreen(),
+         },
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const LoginScreen()
+      home: const HomeScreen()
     );
   }
 }

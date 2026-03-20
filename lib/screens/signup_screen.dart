@@ -6,7 +6,7 @@ class SignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xF6F3F3F3),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -127,7 +127,7 @@ class SignupScreen extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // TODO: Navigate to login
+                        Navigator.pushNamed(context, '/login');
                       },
                       child: const Text(
                         'Log in',

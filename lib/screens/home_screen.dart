@@ -25,15 +25,26 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 80),
+                const SizedBox(height: 100),
                 const Text(
-                  'Chat with your friends\neasily & quickly',
+                  'Chat with your friends',
                   style: TextStyle(
-                    fontSize: 36,
+                    fontSize: 42,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
-                    height: 1.15,
+                    height: 1.45,
                   ),
+                  
+                ),
+                   const Text(
+                  'easily & quickly',
+                  style: TextStyle(
+                    fontSize: 38,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    height: 1.45,
+                  ),
+                  
                 ),
                 const Spacer(),
                 SizedBox(
@@ -64,10 +75,7 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     const Text(
                       'Already have an account? ',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -80,6 +88,7 @@ class HomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                           decoration: TextDecoration.underline,
+                          decorationColor: Colors.white,
                         ),
                       ),
                     ),

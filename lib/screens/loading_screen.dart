@@ -19,11 +19,10 @@ class LoadingScreen extends StatelessWidget {
                 image: AssetImage('lib/assets/images/logo.png'),
                 fit: BoxFit.contain,
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
-  

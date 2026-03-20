@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:yuchat/screens/home_screen.dart';
 import 'package:yuchat/screens/loading_screen.dart';
+import 'package:yuchat/screens/signup_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomeScreen()
+      home: const SignupScreen()
     );
   }
 }

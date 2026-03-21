@@ -1,0 +1,113 @@
+import 'package:flutter/material.dart';
+import 'package:yuchat/screens/login_screen.dart';
+import 'package:yuchat/screens/signup_screen.dart';
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color(0xFF6E6E6E), // Top dark gray
+              Color(0xFF222222), // Bottom darker gray
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 100),
+                const Text(
+                  'Chat with your friends',
+                  style: TextStyle(
+                    fontSize: 42,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    height: 1.45,
+                  ),
+                  
+                ),
+                   const Text(
+                  'easily & quickly',
+                  style: TextStyle(
+                    fontSize: 38,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    height: 1.45,
+                  ),
+                  
+                ),
+                const Spacer(),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                        Navigator.push(
+                            context,
+                             MaterialPageRoute(builder: (context) => const SignupScreen()),
+                            );
+                    },
+                    child: const Text('Sign up'),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Already have an account? ',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const LoginScreen()),
+                              );
+                      },
+                      child: const Text(
+                        'Log in',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

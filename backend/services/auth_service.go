@@ -1,6 +1,13 @@
 package services
 
 import (
+
+
+    "time"
+
+	"github.com/golang-jwt/jwt/v5"
+	"yuchat/backend/config"
+
 	"errors"
 
 	"golang.org/x/crypto/bcrypt"
@@ -39,4 +46,37 @@ func (s *AuthService) Signup(username, password string) error {
 	}
 
 	return nil
+}
+
+
+
+
+func (s *AuthService) Login(username, password string) (string, error) {
+	var user models.User
+	if err := db.DB.Where("username = ?", username).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return "", errors.New("invalid username or password")
+		}
+		return "", err
+	}
+
+	if !user.CheckPassword(password) {
+		return "", errors.New("invalid username or password")
+	}
+
+	// Generate JWT
+	claims := jwt.MapClaims{
+		"sub": user.ID,
+		"username": user.Username,
+		"iat": time.Now().Unix(),
+		"exp": time.Now().Add(config.AccessTokenDuration).Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(config.JWTSecret)
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }

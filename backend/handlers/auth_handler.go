@@ -69,3 +69,32 @@ func SignupHandler(c *gin.Context) {
 		"username": input.Username,
 	})
 }
+
+
+
+
+func LoginHandler(c *gin.Context) {
+	var input dto.LoginInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		// Reuse your improved validation error handling from before
+		// or keep simple for now:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input", "details": err.Error()})
+		return
+	}
+
+	token, err := services.Auth.Login(input.Username, input.Password)
+	if err != nil {
+		if err.Error() == "invalid username or password" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid username or password"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, dto.AuthResponse{
+		AccessToken: token,
+		Username:    input.Username,
+		ExpiresIn:   int(config.AccessTokenDuration.Seconds()),
+	})
+}

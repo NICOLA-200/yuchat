@@ -30,6 +30,7 @@ func main() {
 	auth := api.Group("/auth")
 	{
 		auth.POST("/signup", handlers.SignupHandler)
+		auth.POST("/login",  handlers.LoginHandler)
 		r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":   "Hello from Gin + GORM + PostgreSQL!",

@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
     "fmt"
+	"yuchat/backend/config"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"yuchat/backend/dto"      // adjust module name

@@ -45,4 +45,5 @@ func ConnectDatabase() {
 
 	// Optional: AutoMigrate your models later (uncomment when you have models)
 	// DB.AutoMigrate(&User{}, &Product{}, ...)
+	
 }

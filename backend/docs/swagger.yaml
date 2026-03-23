@@ -1,3 +1,4 @@
+basePath: /api
 definitions:
   dto.AuthResponse:
     properties:
@@ -41,8 +42,19 @@ definitions:
     - password
     - username
     type: object
+host: localhost:8080
 info:
-  contact: {}
+  contact:
+    email: support@yuchat.example.com
+    name: API Support
+    url: http://example.com/support
+  description: Simple chat backend with user authentication
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://example.com/terms/
+  title: YuChat API
+  version: "1.0"
 paths:
   /auth/login:
     post:
@@ -125,4 +137,6 @@ paths:
       summary: Register a new user
       tags:
       - auth
+schemes:
+- http
 swagger: "2.0"

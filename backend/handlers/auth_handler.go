@@ -10,6 +10,23 @@ import (
 	"yuchat/backend/services" // adjust
 )
 
+
+
+
+
+
+// Signup godoc
+// @Summary      Register a new user
+// @Description  Create a new user account with username and password
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        body  body  dto.SignupInput  true  "User registration data"
+// @Success      201   {object}  map[string]interface{}  "User created"
+// @Failure      400   {object}  map[string]string  "Validation error"
+// @Failure      409   {object}  map[string]string  "Username taken"
+// @Failure      500   {object}  map[string]string  "Server error"
+// @Router       /auth/signup [post]
 func SignupHandler(c *gin.Context) {
 	var input dto.SignupInput
 
@@ -74,6 +91,22 @@ func SignupHandler(c *gin.Context) {
 
 
 
+
+
+
+
+// Login godoc
+// @Summary      Authenticate user and get JWT
+// @Description  Login with username and password, returns JWT access token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        body  body  dto.LoginInput  true  "Login credentials"
+// @Success      200   {object}  dto.AuthResponse
+// @Failure      400   {object}  map[string]string  "Invalid input"
+// @Failure      401   {object}  map[string]string  "Invalid credentials"
+// @Failure      500   {object}  map[string]string  "Server error"
+// @Router       /auth/login [post]
 func LoginHandler(c *gin.Context) {
 	var input dto.LoginInput
 	if err := c.ShouldBindJSON(&input); err != nil {

@@ -5,7 +5,7 @@ import 'package:yuchat/screens/login_screen.dart';
 import 'package:yuchat/screens/signup_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+   runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {

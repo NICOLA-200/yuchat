@@ -53,12 +53,22 @@ func main() {
 	r := gin.Default()
 
 	api := r.Group("/api")
+    // After auth group
+    profile := api.Group("/profile")
+     {
+	profile.GET("", handlers.GetMyProfile)
+	profile.PUT("", handlers.UpdateMyProfile)
+     }
+
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":   "Hello from Gin + GORM + PostgreSQL!",
 			"db_status": "connected", // just to prove it works
 		})
 	})
+
+
+
     r.GET("/swagger/*any", func(c *gin.Context) {
     log.Println("Swagger handler hit for path:", c.Request.URL.Path)
     ginSwagger.WrapHandler(swaggerFiles.Handler)(c)

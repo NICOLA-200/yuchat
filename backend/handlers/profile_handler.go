@@ -89,3 +89,36 @@ func UpdateMyProfile(c *gin.Context) {
 		"profile_picture":  profilePicURL,
 	})
 }
+
+
+
+
+// GetAllUsers godoc
+// @Summary      Get all users
+// @Description  Returns list of all users with their public profile (username, slogan, profile picture)
+// @Tags         users
+// @Produce      json
+// @Success      200  {array}   dto.GetAllUsersResponse
+// @Failure      500  {object}  map[string]string
+// @Router       /users [get]
+func GetAllUsers(c *gin.Context) {
+	users, err := services.Auth.GetAllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch users"})
+		return
+	}
+
+	// Convert to response DTO
+	response := make([]dto.GetAllUsersResponse, len(users))
+	for i, user := range users {
+		response[i] = dto.GetAllUsersResponse{
+			ID:             user.ID,
+			Username:       user.Username,
+			Slogan:         user.Slogan,
+			ProfilePicture: user.ProfilePicture,
+			CreatedAt:      user.CreatedAt.Format(time.RFC3339),
+		}
+	}
+
+	c.JSON(http.StatusOK, response)
+}

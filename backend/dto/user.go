@@ -14,3 +14,14 @@ type UserProfileResponse struct {
 	ProfilePicture string `json:"profile_picture,omitempty"`
 	CreatedAt      string `json:"created_at"`
 }
+
+
+
+// GetAllUsersResponse represents public user profile (safe to expose)
+type GetAllUsersResponse struct {
+	ID             uint   `json:"id"`
+	Username       string `json:"username"`
+	Slogan         string `json:"slogan,omitempty"`
+	ProfilePicture string `json:"profile_picture,omitempty"`
+	CreatedAt      string `json:"created_at"`
+}

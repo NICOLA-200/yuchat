@@ -20,19 +20,6 @@ type AuthResponse struct {
 }
 
 
-package dto
 
-// For updating profile
-type UpdateProfileInput struct {
-	Slogan         string `json:"slogan" binding:"max=150"`
-	ProfilePicture string `json:"profile_picture" binding:"omitempty,url"` // optional URL validation
-}
 
-// Response when getting profile
-type UserProfileResponse struct {
-	ID             uint   `json:"id"`
-	Username       string `json:"username"`
-	Slogan         string `json:"slogan,omitempty"`
-	ProfilePicture string `json:"profile_picture,omitempty"`
-	CreatedAt      string `json:"created_at"`
-}
+

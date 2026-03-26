@@ -59,7 +59,13 @@ func main() {
 	profile.GET("", handlers.GetMyProfile)
 	profile.PUT("", handlers.UpdateMyProfile)
      }
-
+    
+	// After profile group or near auth group
+users := api.Group("/users")
+{
+	users.GET("", handlers.GetAllUsers)
+}
+ 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":   "Hello from Gin + GORM + PostgreSQL!",

@@ -6,6 +6,50 @@ import (
 	"yuchat/backend/services"
 )
 
+// GetMyProfile godoc
+// @Summary      Get current user's profile
+// @Description  Returns profile of the logged-in user
+// @Tags         profile
+// @Security     BearerAuth
+// @Produce      json
+// @Success      200  {object}  dto.UserProfileResponse
+// @Failure      401  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /profile [get]
+func GetMyProfile(c *gin.Context) {
+	userID := c.GetUint("user_id") // coming from JWT middleware (we'll add this)
+
+	user, err := services.Auth.GetProfile(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch profile"})
+		return
+	}
+
+	response := dto.UserProfileResponse{
+		ID:             user.ID,
+		Username:       user.Username,
+		Slogan:         user.Slogan,
+		ProfilePicture: user.ProfilePicture,
+		CreatedAt:      user.CreatedAt.Format(time.RFC3339),
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+
+
+// UpdateMyProfile godoc
+// @Summary      Update current user's profile
+// @Description  Update slogan and/or profile picture of logged-in user
+// @Tags         profile
+// @Security     BearerAuth
+// @Accept       json
+// @Produce      json
+// @Param        body  body  dto.UpdateProfileInput  true  "Profile update data"
+// @Success      200  {object}  map[string]string
+// @Failure      400  {object}  map[string]string
+// @Failure      401  {object}  map[string]string
+// @Router       /profile [put]
 func UpdateMyProfile(c *gin.Context) {
 	userID := c.GetUint("user_id")
 

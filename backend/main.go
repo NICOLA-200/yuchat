@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"github.com/joho/godotenv"
     "log"
 	"github.com/gin-gonic/gin"
 	"yuchat/backend/db"
@@ -33,6 +34,10 @@ import (
 // @BasePath  /api
 // @schemes   http
 func main() {
+	_ = godotenv.Load()   // load .env file
+
+    config.InitCloudinary()
+    
 	// Connect to PostgreSQL when server starts
 	db.ConnectDatabase()
 

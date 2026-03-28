@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'bottom_nav_bar.dart';
+import 'package:yuchat/widgets/bottom_navbar.dart';
+
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

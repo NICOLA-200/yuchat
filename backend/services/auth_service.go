@@ -80,3 +80,33 @@ func (s *AuthService) Login(username, password string) (string, error) {
 
 	return tokenString, nil
 }
+
+
+
+// GetProfile returns user profile by ID (for logged-in user)
+func (s *AuthService) GetProfile(userID uint) (*models.User, error) {
+	var user models.User
+	if err := db.DB.First(&user, userID).Error; err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+// UpdateProfile updates slogan and profile picture
+func (s *AuthService) UpdateProfile(userID uint, input dto.UpdateProfileInput) error {
+	updateData := map[string]interface{}{
+		"slogan":          input.Slogan,
+		"profile_picture": input.ProfilePicture,
+	}
+
+	result := db.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updateData)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.New("user not found")
+	}
+
+	return nil
+}

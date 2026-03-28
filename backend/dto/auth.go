@@ -18,3 +18,8 @@ type AuthResponse struct {
 	Username    string `json:"username"`
 	ExpiresIn   int    `json:"expires_in"` // in seconds
 }
+
+
+
+
+

@@ -6,9 +6,12 @@ import (
 "golang.org/x/crypto/bcrypt"
 )
 type User struct {
-	gorm.Model          // adds ID, CreatedAt, UpdatedAt, DeletedAt
-	Username string `gorm:"size:50;unique;not null;index"`
-	Password string `gorm:"size:255;not null"` // will store bcrypt hash
+	gorm.Model
+	Username       string `gorm:"size:50;unique;not null;index"`
+	Password       string `gorm:"size:255;not null"`
+	Slogan         string `gorm:"size:150"`
+	ProfilePicture string `gorm:"size:500"`   // Cloudinary secure URL
+	LastLogin      time.Time `gorm:"index"`
 }
 
 func (u *User) CheckPassword(password string) bool {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yuchat/screens/home_screen.dart';
 import 'package:yuchat/screens/loading_screen.dart';
 import 'package:yuchat/screens/login_screen.dart';
+import 'package:yuchat/screens/profile_screen.dart';
 import 'package:yuchat/screens/signup_screen.dart';
 
 void main() {
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const HomeScreen()
+      home: const ProfileScreen()
     );
   }
 }

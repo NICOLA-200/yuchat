@@ -1,13 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/token_storage.dart';
 
-final authTokenProvider = StateNotifierProvider<AuthTokenNotifier, String?>(
-  (_) => AuthTokenNotifier(),
-);
+// 1. Use NotifierProvider instead
+final authTokenProvider = NotifierProvider<AuthTokenNotifier, String?>(() {
+  return AuthTokenNotifier();
+});
 
-class AuthTokenNotifier extends StateNotifier<String?> {
-  AuthTokenNotifier() : super(null) {
+// 2. Extend Notifier instead of StateNotifier
+class AuthTokenNotifier extends Notifier<String?> {
+  
+  // 3. Logic previously in the constructor goes in 'build'
+  @override
+  String? build() {
     _loadToken();
+    return null; // Initial state
   }
 
   Future<void> _loadToken() async {

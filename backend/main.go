@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"github.com/joho/godotenv"
     "log"
+	"yuchat/backend/config"
 	"github.com/gin-gonic/gin"
 	"yuchat/backend/db"
 	_ "yuchat/backend/docs"

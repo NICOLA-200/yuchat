@@ -12,6 +12,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"yuchat/backend/dto"
 	"yuchat/backend/db"      // adjust to your module name
 	"yuchat/backend/models"   // adjust
 )

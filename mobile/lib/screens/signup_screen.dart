@@ -14,6 +14,9 @@ class SignupScreen extends ConsumerStatefulWidget {
 class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  String? _error;
+  String? _success;
   bool _isLoading = false;
 
   @override
@@ -23,44 +26,87 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     super.dispose();
   }
 
+  String? _validate() {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      return 'All fields are required';
+    }
+    if (username.length < 3) {
+      return 'Username must be at least 3 characters';
+    }
+    if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(username)) {
+      return 'Username must be alphanumeric';
+    }
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    return null;
+  }
+
   Future<void> _handleSignup() async {
-    if (_usernameController.text.isEmpty ||
-        _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in all fields')),
-      );
+    setState(() {
+      _error = null;
+      _success = null;
+    });
+
+    final validationError = _validate();
+    if (validationError != null) {
+      setState(() => _error = validationError);
       return;
     }
 
     setState(() => _isLoading = true);
 
     try {
-      final token = await AuthService.signup(
-        _usernameController.text,
-        _passwordController.text,
+      final message = await AuthService.signup(
+        _usernameController.text.trim(),
+        _passwordController.text.trim(),
       );
 
-      // Save token using Riverpod provider
-      await ref.read(authTokenProvider.notifier).setToken(token);
+      setState(() => _success = message);
+
+      await Future.delayed(const Duration(seconds: 2));
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Signup successful!')),
-        );
-        // Navigate to home or next screen
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacementNamed(context, '/login');
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Signup failed: $e')),
-        );
-      }
+      setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  Widget _messageBox() {
+    if (_error != null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.red.shade100,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(_error!, style: const TextStyle(color: Colors.red)),
+      );
+    }
+
+    if (_success != null) {
+      return Container(
+        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.green.shade100,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(_success!, style: const TextStyle(color: Colors.green)),
+      );
+    }
+
+    return const SizedBox();
   }
 
   @override
@@ -96,6 +142,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ],
                 ),
                 const SizedBox(height: 100),
+                // Message box (error or success)
+                _messageBox(),
                 // Username field
                 TextField(
                   controller: _usernameController,

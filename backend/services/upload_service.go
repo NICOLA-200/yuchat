@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"mime/multipart"
-	"path/filepath"
+	
 	"time"
 
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"

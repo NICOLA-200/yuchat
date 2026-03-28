@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"github.com/joho/godotenv"
     "log"
+	"yuchat/backend/config"
 	"github.com/gin-gonic/gin"
 	"yuchat/backend/db"
 	_ "yuchat/backend/docs"
@@ -59,7 +60,8 @@ func main() {
 	profile.GET("", handlers.GetMyProfile)
 	profile.PUT("", handlers.UpdateMyProfile)
      }
-
+    
+	api.GET("/users", handlers.GetAllUsers) 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":   "Hello from Gin + GORM + PostgreSQL!",

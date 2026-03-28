@@ -12,6 +12,7 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"yuchat/backend/dto"
 	"yuchat/backend/db"      // adjust to your module name
 	"yuchat/backend/models"   // adjust
 )
@@ -109,4 +110,18 @@ func (s *AuthService) UpdateProfile(userID uint, input dto.UpdateProfileInput) e
 	}
 
 	return nil
+}
+
+
+
+// GetAllUsers returns basic public profile of all users (excluding password)
+func (s *AuthService) GetAllUsers() ([]models.User, error) {
+	var users []models.User
+
+	// Select only needed fields for security and performance
+	err := db.DB.Select("id, username, slogan, profile_picture, created_at").
+		Order("created_at DESC").
+		Find(&users).Error
+
+	return users, err
 }

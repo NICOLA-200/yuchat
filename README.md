@@ -68,6 +68,6 @@ This will launch the Flutter app on your connected device or emulator.
 ## Project Structure
 
 - `lib/`: Flutter frontend code
-- `backend/`: Go backend code (create this directory if not present)
+- `backend/`: Go backend code
 - `android/`, `ios/`, etc.: Platform-specific code
 

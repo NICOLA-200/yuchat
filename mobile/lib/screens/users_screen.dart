@@ -108,7 +108,7 @@ class _UsersScreenState extends State<UsersScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const AppBottomNavBar(currentIndex: 1),
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 0),
     );
   }
 }

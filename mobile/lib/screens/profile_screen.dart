@@ -16,11 +16,17 @@ class ProfileScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () => Navigator.of(context).pop(),
-                    tooltip: 'Back',
-                  ),
+                     const SizedBox(width: 48),
+
+    // CENTER — title sits perfectly in the middle
+    const Text(
+      'Profile',
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Color(0xFF2D2D2D),
+      ),
+    ),
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.black),
                     onPressed: () {

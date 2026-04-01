@@ -119,10 +119,17 @@ func LoginHandler(c *gin.Context) {
 	token, err := services.Auth.Login(input.Username, input.Password)
 	if err != nil {
 		if err.Error() == "invalid username or password" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid username or password"})
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error":   "invalid credentials",
+				"details": []string{"invalid username or password"},
+			})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "server error",
+			"details": []string{"failed to generate token"},
+		})
 		return
 	}
 

@@ -15,7 +15,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  String? _error;
+  String? _usernameError;
+  String? _passwordError;
   String? _success;
   bool _isLoading = false;
 
@@ -26,36 +27,41 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     super.dispose();
   }
 
-  String? _validate() {
+  bool _validate() {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (username.isEmpty || password.isEmpty) {
-      return 'All fields are required';
+    String? usernameErr;
+    String? passwordErr;
+
+    if (username.isEmpty) {
+      usernameErr = 'Username is required';
+    } else if (username.length < 3) {
+      usernameErr = 'Username must be at least 3 characters';
+    } else if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(username)) {
+      usernameErr = 'Username must be alphanumeric';
     }
-    if (username.length < 3) {
-      return 'Username must be at least 3 characters';
+
+    if (password.isEmpty) {
+      passwordErr = 'Password is required';
+    } else if (password.length < 8) {
+      passwordErr = 'Password must be at least 8 characters';
     }
-    if (!RegExp(r'^[a-zA-Z0-9]+$').hasMatch(username)) {
-      return 'Username must be alphanumeric';
-    }
-    if (password.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
-    return null;
+
+    setState(() {
+      _usernameError = usernameErr;
+      _passwordError = passwordErr;
+    });
+
+    return usernameErr == null && passwordErr == null;
   }
 
   Future<void> _handleSignup() async {
     setState(() {
-      _error = null;
       _success = null;
     });
 
-    final validationError = _validate();
-    if (validationError != null) {
-      setState(() => _error = validationError);
-      return;
-    }
+    if (!_validate()) return;
 
     setState(() => _isLoading = true);
 
@@ -73,7 +79,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         Navigator.pushReplacementNamed(context, '/login');
       }
     } catch (e) {
-      setState(() => _error = e.toString().replaceFirst('Exception: ', ''));
+      setState(() => _usernameError = e.toString().replaceFirst('Exception: ', ''));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -81,32 +87,48 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     }
   }
 
-  Widget _messageBox() {
-    if (_error != null) {
-      return Container(
-        padding: const EdgeInsets.all(12),
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: Colors.red.shade100,
-          borderRadius: BorderRadius.circular(8),
+  InputDecoration _fieldDecoration(String hint, String? errorText) {
+    final hasError = errorText != null;
+    return InputDecoration(
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.transparent,
+      errorText: errorText,
+      errorStyle: const TextStyle(color: Colors.red, fontSize: 13),
+      contentPadding: const EdgeInsets.symmetric(
+        vertical: 20,
+        horizontal: 16,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: hasError ? Colors.red : Colors.black,
+          width: 1,
         ),
-        child: Text(_error!, style: const TextStyle(color: Colors.red)),
-      );
-    }
-
-    if (_success != null) {
-      return Container(
-        padding: const EdgeInsets.all(12),
-        margin: const EdgeInsets.only(bottom: 16),
-        decoration: BoxDecoration(
-          color: Colors.green.shade100,
-          borderRadius: BorderRadius.circular(8),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: hasError ? Colors.red : Colors.black,
+          width: 1,
         ),
-        child: Text(_success!, style: const TextStyle(color: Colors.green)),
-      );
-    }
-
-    return const SizedBox();
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(
+          color: hasError ? Colors.red : Colors.black,
+          width: 1.5,
+        ),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.red, width: 1),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Colors.red, width: 1.5),
+      ),
+    );
   }
 
   @override
@@ -142,34 +164,26 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ],
                 ),
                 const SizedBox(height: 100),
-                // Message box (error or success)
-                _messageBox(),
+                // Success box
+                if (_success != null)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(_success!, style: const TextStyle(color: Colors.green)),
+                  ),
                 // Username field
                 TextField(
                   controller: _usernameController,
-                  decoration: InputDecoration(
-                    hintText: 'Your username',
-                    filled: true,
-                    fillColor: Colors.transparent,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 20,
-                      horizontal: 16,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1,
-                      ),
-                    ),
-                  ),
+                  onChanged: (_) {
+                    if (_usernameError != null) {
+                      setState(() => _usernameError = null);
+                    }
+                  },
+                  decoration: _fieldDecoration('Your username', _usernameError),
                   style: const TextStyle(fontSize: 18),
                 ),
                 const SizedBox(height: 24),
@@ -177,29 +191,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
-                  decoration: InputDecoration(
-                    hintText: 'Your password',
-                    filled: true,
-                    fillColor: Colors.transparent,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 20,
-                      horizontal: 16,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.black,
-                        width: 1,
-                      ),
-                    ),
-                  ),
+                  onChanged: (_) {
+                    if (_passwordError != null) {
+                      setState(() => _passwordError = null);
+                    }
+                  },
+                  decoration: _fieldDecoration('Your password', _passwordError),
                   style: const TextStyle(fontSize: 18),
                 ),
                 const SizedBox(height: 36),
@@ -227,8 +224,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation(Colors.white),
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
                             ),
                           )
                         : const Text('Sign up'),

@@ -93,35 +93,34 @@ func (s *AuthService) GetProfile(userID uint) (*models.User, error) {
 	return &user, nil
 }
 
-// UpdateProfile updates slogan and profile picture
+
+
+
 func (s *AuthService) UpdateProfile(userID uint, input dto.UpdateProfileInput) error {
-	updateData := map[string]interface{}{
-		"slogan":          input.Slogan,
-		"profile_picture": input.ProfilePicture,
-	}
+    updates := map[string]interface{}{}
 
-	result := db.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updateData)
-	if result.Error != nil {
-		return result.Error
-	}
+    // Check username availability if provided
+    if input.Username != "" {
+        var existing models.User
+        result := db.DB.Where("username = ? AND id != ?", input.Username, userID).First(&existing)
+        if result.Error == nil {
+            // found a user with that username who isn't the current user
+            return errors.New("username already taken")
+        }
+        updates["username"] = input.Username
+    }
 
-	if result.RowsAffected == 0 {
-		return errors.New("user not found")
-	}
+    if input.Slogan != "" {
+        updates["slogan"] = input.Slogan
+    }
 
-	return nil
-}
+    if input.ProfilePicture != "" {
+        updates["profile_picture"] = input.ProfilePicture
+    }
 
+    if len(updates) == 0 {
+        return nil // nothing to update, no-op
+    }
 
-
-// GetAllUsers returns basic public profile of all users (excluding password)
-func (s *AuthService) GetAllUsers() ([]models.User, error) {
-	var users []models.User
-
-	// Select only needed fields for security and performance
-	err := db.DB.Select("id, username, slogan, profile_picture, created_at").
-		Order("created_at DESC").
-		Find(&users).Error
-
-	return users, err
+    return db.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updates).Error
 }

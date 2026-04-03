@@ -56,7 +56,6 @@ func GetProfileByID(c *gin.Context) {
 // @Failure      401  {object}  map[string]string
 // @Router       /profile/{id} [put]
 func UpdateMyProfile(c *gin.Context) {
-    // Always use the JWT identity — :id param is ignored for security
     jwtUserID := c.GetUint("user_id")
 
     if err := c.Request.ParseMultipartForm(5 << 20); err != nil {
@@ -65,8 +64,12 @@ func UpdateMyProfile(c *gin.Context) {
     }
 
     var input dto.UpdateProfileInput
-    input.Slogan = c.PostForm("slogan")
+    if err := c.ShouldBind(&input); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
+    // Handle optional profile picture
     var profilePicURL string
     fileHeader, err := c.FormFile("profile_picture")
     if err == nil && fileHeader != nil {
@@ -83,6 +86,11 @@ func UpdateMyProfile(c *gin.Context) {
     }
 
     if err := services.Auth.UpdateProfile(jwtUserID, input); err != nil {
+        // username conflict gets its own status code
+        if err.Error() == "username already taken" {
+            c.JSON(http.StatusConflict, gin.H{"error": "username already taken"})
+            return
+        }
         c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update profile"})
         return
     }

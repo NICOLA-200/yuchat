@@ -57,8 +57,8 @@ func main() {
     // After auth group
     profile := api.Group("/profile")
      {
-	profile.GET("", handlers.GetMyProfile)
-	profile.PUT("", handlers.UpdateMyProfile)
+      profile.GET("/:id", handlers.GetProfileByID)   // public: get any user's profile
+      profile.PUT("/:id", handlers.UpdateMyProfile)  // protected: only owner can update
      }
     
 	api.GET("/users", handlers.GetAllUsers) 

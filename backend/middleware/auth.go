@@ -5,7 +5,7 @@ import (
     "strings"
 
     "github.com/gin-gonic/gin"
-    "yuchat/backend/config"
+    "os"
     "github.com/golang-jwt/jwt/v5"
 )
 
@@ -22,7 +22,7 @@ func AuthRequired() gin.HandlerFunc {
 
         // Parse and validate token
         token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-            return []byte(config.JWTSecret), nil
+            return []byte(os.Getenv("JWT_SECRET")), nil
         })
 
         if err != nil || !token.Valid {

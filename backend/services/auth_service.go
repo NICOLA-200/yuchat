@@ -67,7 +67,7 @@ func (s *AuthService) Login(username, password string) (string, error) {
 
 	// Generate JWT
 	claims := jwt.MapClaims{
-		"sub": user.ID,
+		"user_id": user.ID,
 		"username": user.Username,
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(config.AccessTokenDuration).Unix(),

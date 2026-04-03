@@ -67,7 +67,7 @@ func (s *AuthService) Login(username, password string) (string, error) {
 
 	// Generate JWT
 	claims := jwt.MapClaims{
-		"sub": user.ID,
+		"user_id": user.ID,
 		"username": user.Username,
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(config.AccessTokenDuration).Unix(),
@@ -96,16 +96,14 @@ func (s *AuthService) GetProfile(userID uint) (*models.User, error) {
 
 
 
-func (s *AuthService) UpdateProfile(userID uint, input dto.UpdateProfileInput) error {
+func (s *AuthService) UpdateProfile(userID uint, input dto.UpdateProfileInput) (*models.User, error) {
     updates := map[string]interface{}{}
 
-    // Check username availability if provided
     if input.Username != "" {
         var existing models.User
         result := db.DB.Where("username = ? AND id != ?", input.Username, userID).First(&existing)
         if result.Error == nil {
-            // found a user with that username who isn't the current user
-            return errors.New("username already taken")
+            return nil, errors.New("username already taken")
         }
         updates["username"] = input.Username
     }
@@ -118,13 +116,20 @@ func (s *AuthService) UpdateProfile(userID uint, input dto.UpdateProfileInput) e
         updates["profile_picture"] = input.ProfilePicture
     }
 
-    if len(updates) == 0 {
-        return nil // nothing to update, no-op
+    if len(updates) > 0 {
+        if err := db.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updates).Error; err != nil {
+            return nil, err
+        }
     }
 
-    return db.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updates).Error
-}
+    // Fetch and return the fresh updated user
+    var user models.User
+    if err := db.DB.First(&user, userID).Error; err != nil {
+        return nil, err
+    }
 
+    return &user, nil
+}
 
 // GetAllUsers returns basic public profile of all users (excluding password)
 func (s *AuthService) GetAllUsers() ([]models.User, error) {

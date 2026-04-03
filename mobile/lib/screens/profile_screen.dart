@@ -16,7 +16,13 @@ class ProfileScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                     const SizedBox(width: 48),
+                   IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.black),
+                    onPressed: () {
+                      // TODO: navigate to edit profile screen
+                    },
+                    tooltip: 'delete',
+                  ),
 
     // CENTER — title sits perfectly in the middle
     const Text(

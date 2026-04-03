@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
     "log"
 	"yuchat/backend/config"
+	"yuchat/backend/middleware"
 	"github.com/gin-gonic/gin"
 	"yuchat/backend/db"
 	_ "yuchat/backend/docs"
@@ -56,10 +57,14 @@ func main() {
 	api := r.Group("/api")
     // After auth group
     profile := api.Group("/profile")
+
      {
-	profile.GET("", handlers.GetMyProfile)
-	profile.PUT("", handlers.UpdateMyProfile)
-     }
+    // No middleware here -> this is public
+    profile.GET("/:id", handlers.GetProfileByID) 
+
+    // Middleware added only to this specific route
+    profile.PUT("/:id", middleware.AuthRequired(), handlers.UpdateMyProfile) 
+    }
     
 	api.GET("/users", handlers.GetAllUsers) 
 	r.GET("/", func(c *gin.Context) {

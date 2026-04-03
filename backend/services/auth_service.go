@@ -67,7 +67,7 @@ func (s *AuthService) Login(username, password string) (string, error) {
 
 	// Generate JWT
 	claims := jwt.MapClaims{
-		"sub": user.ID,
+		"user_id": user.ID,
 		"username": user.Username,
 		"iat": time.Now().Unix(),
 		"exp": time.Now().Add(config.AccessTokenDuration).Unix(),
@@ -93,26 +93,43 @@ func (s *AuthService) GetProfile(userID uint) (*models.User, error) {
 	return &user, nil
 }
 
-// UpdateProfile updates slogan and profile picture
-func (s *AuthService) UpdateProfile(userID uint, input dto.UpdateProfileInput) error {
-	updateData := map[string]interface{}{
-		"slogan":          input.Slogan,
-		"profile_picture": input.ProfilePicture,
-	}
 
-	result := db.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updateData)
-	if result.Error != nil {
-		return result.Error
-	}
 
-	if result.RowsAffected == 0 {
-		return errors.New("user not found")
-	}
 
-	return nil
+func (s *AuthService) UpdateProfile(userID uint, input dto.UpdateProfileInput) (*models.User, error) {
+    updates := map[string]interface{}{}
+
+    if input.Username != "" {
+        var existing models.User
+        result := db.DB.Where("username = ? AND id != ?", input.Username, userID).First(&existing)
+        if result.Error == nil {
+            return nil, errors.New("username already taken")
+        }
+        updates["username"] = input.Username
+    }
+
+    if input.Slogan != "" {
+        updates["slogan"] = input.Slogan
+    }
+
+    if input.ProfilePicture != "" {
+        updates["profile_picture"] = input.ProfilePicture
+    }
+
+    if len(updates) > 0 {
+        if err := db.DB.Model(&models.User{}).Where("id = ?", userID).Updates(updates).Error; err != nil {
+            return nil, err
+        }
+    }
+
+    // Fetch and return the fresh updated user
+    var user models.User
+    if err := db.DB.First(&user, userID).Error; err != nil {
+        return nil, err
+    }
+
+    return &user, nil
 }
-
-
 
 // GetAllUsers returns basic public profile of all users (excluding password)
 func (s *AuthService) GetAllUsers() ([]models.User, error) {

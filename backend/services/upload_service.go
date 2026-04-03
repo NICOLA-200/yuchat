@@ -39,3 +39,5 @@ func (s *UploadService) UploadProfilePicture(fileHeader *multipart.FileHeader, u
 
 	return result.SecureURL, nil   // This is the URL you save in DB
 }
+
+

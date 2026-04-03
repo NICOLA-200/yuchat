@@ -2,10 +2,10 @@ package dto
 
 
 type UpdateProfileInput struct {
-	Slogan         string `form:"slogan" binding:"max=150"`
-	ProfilePicture string `json:"-"` // we set this manually from upload
+    Username       string `form:"username" binding:"omitempty,min=3,max=30"`
+    Slogan         string `form:"slogan" binding:"omitempty,max=150"`
+    ProfilePicture string `json:"-"` // set manually from upload
 }
-
 // Response when getting profile
 type UserProfileResponse struct {
 	ID             uint   `json:"id"`

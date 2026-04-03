@@ -139,3 +139,31 @@ func LoginHandler(c *gin.Context) {
 		ExpiresIn:   int(config.AccessTokenDuration.Seconds()),
 	})
 }
+
+
+
+// DeleteAccount godoc
+// @Summary      Delete current user's account
+// @Description  Permanently deletes the logged-in user's account
+// @Tags         auth
+// @Security     BearerAuth
+// @Produce      json
+// @Success      200  {object}  map[string]string
+// @Failure      401  {object}  map[string]string
+// @Failure      404  {object}  map[string]string
+// @Failure      500  {object}  map[string]string
+// @Router       /auth/delete [delete]
+func DeleteAccountHandler(c *gin.Context) {
+    userID := c.GetUint("user_id")
+
+    if err := services.Auth.DeleteAccount(userID); err != nil {
+        if err.Error() == "user not found" {
+            c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+            return
+        }
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete account"})
+        return
+    }
+
+    c.JSON(http.StatusOK, gin.H{"message": "account deleted successfully"})
+}

@@ -85,6 +85,7 @@ func main() {
 	{
 		auth.POST("/signup", handlers.SignupHandler)
 		auth.POST("/login",  handlers.LoginHandler)
+		auth.DELETE("/delete", middleware.AuthRequired(), handlers.DeleteAccountHandler) 
 		
 
 	}

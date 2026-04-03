@@ -56,6 +56,7 @@ func main() {
 	api := r.Group("/api")
     // After auth group
     profile := api.Group("/profile")
+	profile.Use(middleware.AuthRequired()) 
      {
       profile.GET("/:id", handlers.GetProfileByID)   // public: get any user's profile
       profile.PUT("/:id", handlers.UpdateMyProfile)  // protected: only owner can update

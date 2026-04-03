@@ -72,7 +72,6 @@ func UpdateMyProfile(c *gin.Context) {
     }
 
     // Handle optional profile picture
-    var profilePicURL string
     fileHeader, err := c.FormFile("profile_picture")
     if err == nil && fileHeader != nil {
         url, uploadErr := services.Upload.UploadProfilePicture(fileHeader, jwtUserID)
@@ -80,15 +79,14 @@ func UpdateMyProfile(c *gin.Context) {
             c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to upload image to Cloudinary"})
             return
         }
-        profilePicURL = url
-        input.ProfilePicture = profilePicURL
+        input.ProfilePicture = url
     } else if err != nil && err != http.ErrMissingFile {
         c.JSON(http.StatusBadRequest, gin.H{"error": "invalid file"})
         return
     }
 
-    if err := services.Auth.UpdateProfile(jwtUserID, input); err != nil {
-        // username conflict gets its own status code
+    updatedUser, err := services.Auth.UpdateProfile(jwtUserID, input)
+    if err != nil {
         if err.Error() == "username already taken" {
             c.JSON(http.StatusConflict, gin.H{"error": "username already taken"})
             return
@@ -97,13 +95,15 @@ func UpdateMyProfile(c *gin.Context) {
         return
     }
 
-    c.JSON(http.StatusOK, gin.H{
-        "message":         "profile updated successfully",
-        "profile_picture": profilePicURL,
+    // Return the full updated profile
+    c.JSON(http.StatusOK, dto.UserProfileResponse{
+        ID:             updatedUser.ID,
+        Username:       updatedUser.Username,
+        Slogan:         updatedUser.Slogan,
+        ProfilePicture: updatedUser.ProfilePicture,
+        CreatedAt:      updatedUser.CreatedAt.Format(time.RFC3339),
     })
 }
-
-
 
 
 // GetAllUsers godoc

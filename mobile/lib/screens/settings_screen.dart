@@ -10,14 +10,14 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0F0F),
+      backgroundColor: const Color(0xFFFfffff),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0F0F0F),
+        backgroundColor: const Color(0xFFFFFFFF),
         elevation: 0,
         title: const Text(
           'Settings',
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontWeight: FontWeight.bold,
             fontSize: 22,
           ),
@@ -28,43 +28,43 @@ class SettingsScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           children: [
-            _SectionLabel(label: 'Account'),
-            _SettingsTile(
-              icon: Icons.person_outline,
-              title: 'Edit Profile',
-              subtitle: 'Update your username, slogan and photo',
-              onTap: () {},
-            ),
-            _SettingsTile(
-              icon: Icons.lock_outline,
-              title: 'Change Password',
-              subtitle: 'Keep your account secure',
-              onTap: () {},
-            ),
+            // _SectionLabel(label: 'Account'),
+            // _SettingsTile(
+            //   icon: Icons.person_outline,
+            //   title: 'Edit Profile',
+            //   subtitle: 'Update your username, slogan and photo',
+            //   onTap: () {},
+            // ),
+            // _SettingsTile(
+            //   icon: Icons.lock_outline,
+            //   title: 'Change Password',
+            //   subtitle: 'Keep your account secure',
+            //   onTap: () {},
+            // ),
 
-            const SizedBox(height: 24),
+            // const SizedBox(height: 24),
 
-            _SectionLabel(label: 'Preferences'),
-            _SettingsTile(
-              icon: Icons.notifications_none,
-              title: 'Notifications',
-              subtitle: 'Manage push notifications',
-              onTap: () {},
-            ),
-            _SettingsTile(
-              icon: Icons.color_lens_outlined,
-              title: 'Appearance',
-              subtitle: 'Dark mode, themes',
-              onTap: () {},
-            ),
-            _SettingsTile(
-              icon: Icons.language_outlined,
-              title: 'Language',
-              subtitle: 'English',
-              onTap: () {},
-            ),
+            // _SectionLabel(label: 'Preferences'),
+            // _SettingsTile(
+            //   icon: Icons.notifications_none,
+            //   title: 'Notifications',
+            //   subtitle: 'Manage push notifications',
+            //   onTap: () {},
+            // ),
+            // _SettingsTile(
+            //   icon: Icons.color_lens_outlined,
+            //   title: 'Appearance',
+            //   subtitle: 'Dark mode, themes',
+            //   onTap: () {},
+            // ),
+            // _SettingsTile(
+            //   icon: Icons.language_outlined,
+            //   title: 'Language',
+            //   subtitle: 'English',
+            //   onTap: () {},
+            // ),
 
-            const SizedBox(height: 24),
+            // const SizedBox(height: 24),
 
             _SectionLabel(label: 'About'),
             _SettingsTile(
@@ -134,28 +134,29 @@ class _SettingsTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1C1C1E),
+        color: const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade800, width: 1),
       ),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF2C2C2E),
+            color: const Color(0xFFFFFFFF),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: Colors.white70, size: 20),
+          child: Icon(icon, color: Colors.black, size: 20),
         ),
         title: Text(
           title,
-          style: const TextStyle(color: Colors.white, fontSize: 15),
+          style: const TextStyle(color: Colors.black, fontSize: 15),
         ),
         subtitle: Text(
           subtitle,
-          style: const TextStyle(color: Colors.grey, fontSize: 12),
+          style: const TextStyle(color: Colors.black, fontSize: 12),
         ),
         trailing: onTap != null
-            ? const Icon(Icons.chevron_right, color: Colors.grey, size: 20)
+            ? const Icon(Icons.chevron_right, color: Colors.black, size: 20)
             : null,
         onTap: onTap,
       ),
@@ -182,10 +183,10 @@ class _LogoutButton extends StatelessWidget {
             );
           }
         },
-        icon: const Icon(Icons.logout, color: Colors.white70),
+        icon: const Icon(Icons.logout, color: Colors.black),
         label: const Text(
           'Log Out',
-          style: TextStyle(color: Colors.white70, fontSize: 15),
+          style: TextStyle(color: Colors.black, fontSize: 15),
         ),
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14),
@@ -293,7 +294,7 @@ class _DeleteAccountButtonState extends State<_DeleteAccountButton> {
         ),
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14),
-          backgroundColor: const Color(0xFF2C1010),
+          backgroundColor: const Color(0xFF1C1C1E),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),

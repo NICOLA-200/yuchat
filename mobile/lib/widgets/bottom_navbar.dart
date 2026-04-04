@@ -46,9 +46,9 @@ class AppBottomNavBar extends StatelessWidget {
               _NavItem(
                 index: 0,
                 currentIndex: currentIndex,
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home,
-                label: 'Home',
+                icon: Icons.people_alt_outlined,
+                activeIcon: Icons.people_outline_outlined,
+                label: 'People',
                 onTap: (i) => _onTap(context, i),
               ),
               _NavItem(

@@ -119,6 +119,22 @@ class AuthService {
     if (response.statusCode == 409) throw Exception('Username already taken');
     throw Exception(data['error'] ?? 'Failed to update profile');
   }
+
+  static Future<List<User>> getAllUsers() async {
+  final token = await TokenStorage.readToken();
+  final response = await http.get(
+    Uri.parse('$baseUrl/users'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.map((json) => User.fromJson(json)).toList();
+  }
+  throw Exception('Failed to fetch users');
+}
 }
 
 

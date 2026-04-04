@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'token_storage.dart';
 
 class AuthService {
   // Change this to your backend server URL
@@ -48,4 +49,23 @@ class AuthService {
       throw Exception(data['error'] ?? data['message'] ?? 'Login failed');
     }
   }
+
+
+  static Future<void> deleteAccount() async {
+    final token = await TokenStorage.readToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl/auth/delete'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode != 200) {
+      final data = jsonDecode(response.body);
+      throw Exception(data['error'] ?? 'Failed to delete account');
+    }
+  }
 }
+
+
+

@@ -36,13 +36,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (username.isEmpty) {
       usernameErr = 'Username is required';
     } else if (username.length < 3) {
-      usernameErr = 'Username must be at least 3 characters';
+      usernameErr = 'Username can\'t be less than 3 characters';
     }
 
     if (password.isEmpty) {
       passwordErr = 'Password is required';
     } else if (password.length < 8) {
-      passwordErr = 'Password must be at least 8 characters';
+      passwordErr = 'Password can\'t be less than 8 characters';
     }
 
     setState(() {
@@ -53,11 +53,68 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return usernameErr == null && passwordErr == null;
   }
-
 Future<void> _handleLogin() async {
   if (!_validate()) return;
 
   setState(() => _isLoading = true);
+
+  void showTopSnackBar(String text) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry entry;
+
+    entry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).viewPadding.top + 12,
+        left: 16,
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.red.shade700,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded,
+                    color: Colors.white, size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => entry.remove(),
+                  child: const Icon(Icons.close,
+                      color: Colors.white, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(entry);
+
+    Future.delayed(const Duration(seconds: 4), () {
+      if (entry.mounted) entry.remove();
+    });
+  }
 
   try {
     final token = await AuthService.login(
@@ -74,37 +131,16 @@ Future<void> _handleLogin() async {
     final message = e.toString().replaceFirst('Exception: ', '');
 
     if (mounted) {
-      // If message contains newlines, it came from details list — show each as its own snackbar
       final parts = message.split('\n').where((s) => s.trim().isNotEmpty).toList();
 
       if (parts.length > 1) {
-        // Multiple detail errors — show them sequentially
         for (int i = 0; i < parts.length; i++) {
-          await Future.delayed(Duration(milliseconds: i == 0 ? 0 : 600));
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.warning_amber_rounded,
-                        color: Colors.white, size: 18),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(parts[i])),
-                  ],
-                ),
-                backgroundColor: Colors.red.shade700,
-                behavior: SnackBarBehavior.floating,
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                duration: const Duration(seconds: 3),
-              ),
-            );
-          }
+          await Future.delayed(Duration(milliseconds: i == 0 ? 0 : 700));
+          if (mounted) showTopSnackBar(parts[i]);
         }
       } else {
-        // Single error — show in the red banner as before
-        setState(() => _generalError = message);
+        // ✅ Single error also goes through overlay now, not _generalError
+        showTopSnackBar(parts.first);
       }
     }
   } finally {
@@ -113,7 +149,6 @@ Future<void> _handleLogin() async {
     }
   }
 }
-
 
 
 

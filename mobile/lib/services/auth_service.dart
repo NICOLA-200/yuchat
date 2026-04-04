@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'token_storage.dart';
 
 class AuthService {
   // Change this to your backend server URL
@@ -39,7 +40,7 @@ class AuthService {
     final data = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
-      return data['token'] ?? data['data']?['token'] ?? '';
+      return data['access_token'] ?? data['data']?['token'] ?? '';
     } else {
       // Handle structured backend errors the same way as signup
       if (data['details'] != null) {
@@ -48,4 +49,93 @@ class AuthService {
       throw Exception(data['error'] ?? data['message'] ?? 'Login failed');
     }
   }
+
+
+  static Future<void> deleteAccount() async {
+    final token = await TokenStorage.readToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl/auth/delete'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode != 200) {
+      final data = jsonDecode(response.body);
+      throw Exception(data['error'] ?? 'Failed to delete account');
+    }
+  }
+
+
+    // ── Get profile by ID ──────────────────────────────────
+  static Future<Map<String, dynamic>> getProfile(int userId) async {
+    final token = await TokenStorage.readToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/profile/$userId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      return data;
+    }
+    throw Exception(data['error'] ?? 'Failed to fetch profile');
+  }
+
+  // ── Update profile ─────────────────────────────────────
+  static Future<Map<String, dynamic>> updateProfile({
+    required int userId,
+    String? username,
+    String? slogan,
+    String? profilePicturePath, // local file path if picking image
+  }) async {
+    final token = await TokenStorage.readToken();
+    final request = http.MultipartRequest(
+      'PUT',
+      Uri.parse('$baseUrl/profile/$userId'),
+    );
+
+    request.headers['Authorization'] = 'Bearer $token';
+
+    if (username != null && username.isNotEmpty) {
+      request.fields['username'] = username;
+    }
+    if (slogan != null && slogan.isNotEmpty) {
+      request.fields['slogan'] = slogan;
+    }
+    if (profilePicturePath != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath('profile_picture', profilePicturePath),
+      );
+    }
+
+    final streamed = await request.send();
+    final response = await http.Response.fromStream(streamed);
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) return data;
+    if (response.statusCode == 409) throw Exception('Username already taken');
+    throw Exception(data['error'] ?? 'Failed to update profile');
+  }
+
+  static Future<List<User>> getAllUsers() async {
+  final token = await TokenStorage.readToken();
+  final response = await http.get(
+    Uri.parse('$baseUrl/users'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+  if (response.statusCode == 200) {
+    final List<dynamic> data = jsonDecode(response.body);
+    return data.map((json) => User.fromJson(json)).toList();
+  }
+  throw Exception('Failed to fetch users');
 }
+}
+
+
+

@@ -17,6 +17,9 @@ class AppBottomNavBar extends StatelessWidget {
       case 2:
         Navigator.pushReplacementNamed(context, '/profile');
         break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/settings');
+        break;
     }
   }
 
@@ -43,9 +46,9 @@ class AppBottomNavBar extends StatelessWidget {
               _NavItem(
                 index: 0,
                 currentIndex: currentIndex,
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home,
-                label: 'Home',
+                icon: Icons.people_alt_outlined,
+                activeIcon: Icons.people_outline_outlined,
+                label: 'People',
                 onTap: (i) => _onTap(context, i),
               ),
               _NavItem(
@@ -62,6 +65,14 @@ class AppBottomNavBar extends StatelessWidget {
                 icon: Icons.account_circle_outlined,
                 activeIcon: Icons.account_circle,
                 label: 'Profile',
+                onTap: (i) => _onTap(context, i),
+              ),
+                _NavItem(
+                index: 3,
+                currentIndex: currentIndex,
+                icon: Icons.settings_outlined,
+                activeIcon: Icons.settings,
+                label: 'Settings',
                 onTap: (i) => _onTap(context, i),
               ),
             ],

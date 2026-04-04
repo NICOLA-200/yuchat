@@ -17,7 +17,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   String? _usernameError;
   String? _passwordError;
-  String? _success;
   bool _isLoading = false;
 
   @override
@@ -27,6 +26,68 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     super.dispose();
   }
 
+  // ─── Overlay Snackbar ────────────────────────────────────────────────────────
+  void _showTopSnackBar(String text, {bool isSuccess = false}) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry entry;
+
+    entry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).viewPadding.top + 12,
+        left: 16,
+        right: 16,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: isSuccess ? Colors.green.shade600 : Colors.red.shade700,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 10,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  isSuccess ? Icons.check_circle_outline : Icons.warning_amber_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    text,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => entry.remove(),
+                  child: const Icon(Icons.close, color: Colors.white, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(entry);
+
+    Future.delayed(const Duration(seconds: 4), () {
+      if (entry.mounted) entry.remove();
+    });
+  }
+
+  // ─── Validation ──────────────────────────────────────────────────────────────
   bool _validate() {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
@@ -56,11 +117,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     return usernameErr == null && passwordErr == null;
   }
 
+  // ─── Signup Handler ───────────────────────────────────────────────────────────
   Future<void> _handleSignup() async {
-    setState(() {
-      _success = null;
-    });
-
     if (!_validate()) return;
 
     setState(() => _isLoading = true);
@@ -71,15 +129,29 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         _passwordController.text.trim(),
       );
 
-      setState(() => _success = message);
-
-      await Future.delayed(const Duration(seconds: 2));
+      if (mounted) {
+        _showTopSnackBar(message, isSuccess: true);
+        await Future.delayed(const Duration(seconds: 2));
+      }
 
       if (mounted) {
         Navigator.pushReplacementNamed(context, '/login');
       }
     } catch (e) {
-      setState(() => _usernameError = e.toString().replaceFirst('Exception: ', ''));
+      final message = e.toString().replaceFirst('Exception: ', '');
+
+      if (mounted) {
+        final parts = message.split('\n').where((s) => s.trim().isNotEmpty).toList();
+
+        if (parts.length > 1) {
+          for (int i = 0; i < parts.length; i++) {
+            await Future.delayed(Duration(milliseconds: i == 0 ? 0 : 700));
+            if (mounted) _showTopSnackBar(parts[i]);
+          }
+        } else {
+          _showTopSnackBar(parts.first);
+        }
+      }
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -87,6 +159,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     }
   }
 
+  // ─── Field Decoration ────────────────────────────────────────────────────────
   InputDecoration _fieldDecoration(String hint, String? errorText) {
     final hasError = errorText != null;
     return InputDecoration(
@@ -95,30 +168,18 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       fillColor: Colors.transparent,
       errorText: errorText,
       errorStyle: const TextStyle(color: Colors.red, fontSize: 13),
-      contentPadding: const EdgeInsets.symmetric(
-        vertical: 20,
-        horizontal: 16,
-      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: hasError ? Colors.red : Colors.black,
-          width: 1,
-        ),
+        borderSide: BorderSide(color: hasError ? Colors.red : Colors.black, width: 1),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: hasError ? Colors.red : Colors.black,
-          width: 1,
-        ),
+        borderSide: BorderSide(color: hasError ? Colors.red : Colors.black, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(
-          color: hasError ? Colors.red : Colors.black,
-          width: 1.5,
-        ),
+        borderSide: BorderSide(color: hasError ? Colors.red : Colors.black, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -131,6 +192,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     );
   }
 
+  // ─── Build ───────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,17 +226,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ],
                 ),
                 const SizedBox(height: 100),
-                // Success box
-                if (_success != null)
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade100,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(_success!, style: const TextStyle(color: Colors.green)),
-                  ),
                 // Username field
                 TextField(
                   controller: _usernameController,
@@ -240,9 +291,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       style: TextStyle(color: Colors.black, fontSize: 16),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/login');
-                      },
+                      onTap: () => Navigator.pushNamed(context, '/login'),
                       child: const Text(
                         'Log in',
                         style: TextStyle(

@@ -177,7 +177,7 @@ class _LogoutButton extends StatelessWidget {
           await ref.read(authTokenProvider.notifier).clearToken();
           if (context.mounted) {
             Navigator.of(context).pushNamedAndRemoveUntil(
-              '/signup',
+              '/login',
               (route) => false,
             );
           }

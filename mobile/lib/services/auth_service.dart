@@ -40,7 +40,7 @@ class AuthService {
     final data = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
-      return data['token'] ?? data['data']?['token'] ?? '';
+      return data['access_token'] ?? data['data']?['token'] ?? '';
     } else {
       // Handle structured backend errors the same way as signup
       if (data['details'] != null) {

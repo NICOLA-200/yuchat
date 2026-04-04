@@ -17,6 +17,9 @@ class AppBottomNavBar extends StatelessWidget {
       case 2:
         Navigator.pushReplacementNamed(context, '/profile');
         break;
+      case 3:
+        Navigator.pushReplacementNamed(context, '/settings');
+        break;
     }
   }
 

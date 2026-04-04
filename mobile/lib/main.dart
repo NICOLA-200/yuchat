@@ -6,6 +6,7 @@ import 'package:yuchat/screens/login_screen.dart';
 import 'package:yuchat/screens/profile_screen.dart';
 import 'package:yuchat/screens/signup_screen.dart';
 import 'package:yuchat/screens/users_screen.dart';
+import 'package:yuchat/screens/settings_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -29,8 +30,8 @@ class MyApp extends StatelessWidget {
         '/signup':  (context) => const SignupScreen(),
         '/login':   (context) => const LoginScreen(),
         '/loading': (context) => const LoadingScreen(),
-      },
-      home: const SignupScreen(),
+        '/settings': (conext) => const SettingsScreen(),     },
+      home: const SettingsScreen(),
     );
   }
 }

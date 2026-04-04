@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yuchat/widgets/bottom_navbar.dart';
 import '../services/auth_provider.dart';
 import '../services/auth_service.dart';
 
@@ -22,78 +23,71 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        children: [
-          // ── Profile section ──────────────────────────────
-          _SectionLabel(label: 'Account'),
-          _SettingsTile(
-            icon: Icons.person_outline,
-            title: 'Edit Profile',
-            subtitle: 'Update your username, slogan and photo',
-            onTap: () {
-              // Navigate to profile edit screen
-            },
-          ),
-          _SettingsTile(
-            icon: Icons.lock_outline,
-            title: 'Change Password',
-            subtitle: 'Keep your account secure',
-            onTap: () {},
-          ),
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 3), // adjust index to match your navbar
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          children: [
+            _SectionLabel(label: 'Account'),
+            _SettingsTile(
+              icon: Icons.person_outline,
+              title: 'Edit Profile',
+              subtitle: 'Update your username, slogan and photo',
+              onTap: () {},
+            ),
+            _SettingsTile(
+              icon: Icons.lock_outline,
+              title: 'Change Password',
+              subtitle: 'Keep your account secure',
+              onTap: () {},
+            ),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // ── Preferences section ───────────────────────────
-          _SectionLabel(label: 'Preferences'),
-          _SettingsTile(
-            icon: Icons.notifications_none,
-            title: 'Notifications',
-            subtitle: 'Manage push notifications',
-            onTap: () {},
-          ),
-          _SettingsTile(
-            icon: Icons.color_lens_outlined,
-            title: 'Appearance',
-            subtitle: 'Dark mode, themes',
-            onTap: () {},
-          ),
-          _SettingsTile(
-            icon: Icons.language_outlined,
-            title: 'Language',
-            subtitle: 'English',
-            onTap: () {},
-          ),
+            _SectionLabel(label: 'Preferences'),
+            _SettingsTile(
+              icon: Icons.notifications_none,
+              title: 'Notifications',
+              subtitle: 'Manage push notifications',
+              onTap: () {},
+            ),
+            _SettingsTile(
+              icon: Icons.color_lens_outlined,
+              title: 'Appearance',
+              subtitle: 'Dark mode, themes',
+              onTap: () {},
+            ),
+            _SettingsTile(
+              icon: Icons.language_outlined,
+              title: 'Language',
+              subtitle: 'English',
+              onTap: () {},
+            ),
 
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // ── About section ─────────────────────────────────
-          _SectionLabel(label: 'About'),
-          _SettingsTile(
-            icon: Icons.info_outline,
-            title: 'App Version',
-            subtitle: '1.0.0',
-            onTap: null,
-          ),
-          _SettingsTile(
-            icon: Icons.privacy_tip_outlined,
-            title: 'Privacy Policy',
-            subtitle: 'Read our privacy policy',
-            onTap: () {},
-          ),
+            _SectionLabel(label: 'About'),
+            _SettingsTile(
+              icon: Icons.info_outline,
+              title: 'App Version',
+              subtitle: '1.0.0',
+              onTap: null,
+            ),
+            _SettingsTile(
+              icon: Icons.privacy_tip_outlined,
+              title: 'Privacy Policy',
+              subtitle: 'Read our privacy policy',
+              onTap: () {},
+            ),
 
-          const SizedBox(height: 32),
+            const SizedBox(height: 32),
 
-          // ── Logout button ─────────────────────────────────
-          _LogoutButton(ref: ref),
-
-          const SizedBox(height: 16),
-
-          // ── Delete account button ─────────────────────────
-          _DeleteAccountButton(ref: ref),
-
-          const SizedBox(height: 40),
-        ],
+            _LogoutButton(ref: ref),
+            const SizedBox(height: 16),
+            _DeleteAccountButton(ref: ref),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
@@ -238,15 +232,12 @@ class _DeleteAccountButtonState extends State<_DeleteAccountButton> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(ctx).pop(); // close dialog
+              Navigator.of(ctx).pop();
               _deleteAccount();
             },
             child: const Text(
               'Delete',
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -268,10 +259,7 @@ class _DeleteAccountButtonState extends State<_DeleteAccountButton> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
         );
       }
     } finally {

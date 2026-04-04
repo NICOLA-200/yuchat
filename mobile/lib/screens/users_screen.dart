@@ -113,8 +113,19 @@ class _UsersScreenState extends State<UsersScreen> {
                               itemCount: _filteredUsers.length,
                               separatorBuilder: (_, __) => const SizedBox(height: 8),
                               itemBuilder: (context, index) {
-                                return _UserTile(user: _filteredUsers[index]);
-                              },
+  final user = _filteredUsers[index];
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ViewUserScreen(userId: user.id),
+        ),
+      );
+    },
+    child: _UserTile(user: user),
+  );
+},
                             ),
             ),
           ],

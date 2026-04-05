@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:yuchat/models/user_profile.dart';
 import 'package:yuchat/providers/profile_provider.dart';
-import 'package:yuchat/providers/auth_token_provider.dart';
+import 'package:yuchat/services/auth_provider.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'dart:io';
 

@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'token_storage.dart';
+import '../models/user.dart';
 
 class AuthService {
   // Change this to your backend server URL
@@ -120,7 +121,7 @@ class AuthService {
     throw Exception(data['error'] ?? 'Failed to update profile');
   }
 
-  static Future<List<User>> getAllUsers() async {
+  static Future<List<UserModel>> getAllUsers() async {
   final token = await TokenStorage.readToken();
   final response = await http.get(
     Uri.parse('$baseUrl/users'),
@@ -131,7 +132,7 @@ class AuthService {
   );
   if (response.statusCode == 200) {
     final List<dynamic> data = jsonDecode(response.body);
-    return data.map((json) => User.fromJson(json)).toList();
+    return data.map((json) => UserModel.fromJson(json)).toList();
   }
   throw Exception('Failed to fetch users');
 }

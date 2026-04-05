@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yuchat/widgets/bottom_navbar.dart';
 import 'package:yuchat/providers/profile_provider.dart';
-import 'package:yuchat/providers/auth_token_provider.dart';
+import 'package:yuchat/services/auth_provider.dart';
 import 'package:yuchat/screens/edit_profile_screen.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 

@@ -18,6 +18,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   String? _usernameError;
   String? _passwordError;
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -241,13 +242,24 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 // Password field
                 TextField(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: _obscurePassword,
                   onChanged: (_) {
                     if (_passwordError != null) {
                       setState(() => _passwordError = null);
                     }
                   },
-                  decoration: _fieldDecoration('Your password', _passwordError),
+                  
+                  decoration: InputDecoration(
+                    _fieldDecoration('Your password', _passwordError),
+  // ... your existing decoration props ...
+  suffixIcon: IconButton(
+    icon: Icon(
+      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+      color: Colors.grey,
+    ),
+    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+  ),
+),
                   style: const TextStyle(fontSize: 18),
                 ),
                 const SizedBox(height: 36),

@@ -18,6 +18,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String? _passwordError;
   String? _generalError;
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -274,7 +275,15 @@ Future<void> _handleLogin() async {
                       setState(() => _passwordError = null);
                     }
                   },
-                  decoration: _fieldDecoration('Your password', _passwordError),
+                  decoration: _fieldDecoration('Your password', _passwordError).copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    ),
+                  ),
                   style: const TextStyle(fontSize: 18),
                 ),
                 const SizedBox(height: 36),

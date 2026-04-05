@@ -154,6 +154,8 @@ class AuthService {
   }
 
   static Future<List<UserModel>> getAllUsers() async {
+
+    
     try {
       final token = await TokenStorage.readToken();
       final response = await http.get(

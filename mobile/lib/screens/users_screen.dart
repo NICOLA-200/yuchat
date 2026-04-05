@@ -6,6 +6,7 @@ import 'package:yuchat/widgets/bottom_navbar.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
 import 'view_user_screen.dart';
+import '../utils/network_utils.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key});
@@ -30,6 +31,14 @@ class _UsersScreenState extends State<UsersScreen> {
 
   // In _fetchUsers() — data comes raw from API as List<Map<String,dynamic>>
   Future<void> _fetchUsers() async {
+    if (!await NetworkUtils.isOnline()) {
+      setState(() {
+        _error = 'No internet connection.';
+        _isLoading = false;
+      });
+      return;
+    }
+
     try {
       final List<UserModel> users =
           await AuthService.getAllUsers(); // ✅ already parsed

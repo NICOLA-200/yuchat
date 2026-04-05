@@ -249,17 +249,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     }
                   },
                   
-                  decoration: InputDecoration(
-                    _fieldDecoration('Your password', _passwordError),
-  // ... your existing decoration props ...
-  suffixIcon: IconButton(
-    icon: Icon(
-      _obscurePassword ? Icons.visibility_off : Icons.visibility,
-      color: Colors.grey,
-    ),
-    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-  ),
-),
+                      decoration: _fieldDecoration('Your password', _passwordError).copyWith(
+                   suffixIcon: IconButton(
+                     icon: Icon(
+                       _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                       color: Colors.grey,
+                     ),
+                     onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                   ),
+                 ),
                   style: const TextStyle(fontSize: 18),
                 ),
                 const SizedBox(height: 36),

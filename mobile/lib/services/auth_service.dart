@@ -1,9 +1,19 @@
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'token_storage.dart';
 import '../models/user.dart';
+import 'dart:io';
 
 class AuthService {
+  // Add this helper inside AuthService:
+  static String _handleError(dynamic e) {
+    if (e is SocketException)
+      return 'Server unreachable. Check your connection.';
+    if (e is http.ClientException) return 'Network issue. Please try again.';
+    return e.toString().replaceAll('Exception: ', '');
+  }
+
   // Change this to your backend server URL
   static const String baseUrl =
       'http://192.168.1.69:8080/api'; // Android emulator
@@ -11,6 +21,7 @@ class AuthService {
 
   /// Sign up with username and password
   static Future<String> signup(String username, String password) async {
+    try {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/signup'),
       headers: {'Content-Type': 'application/json'},
@@ -27,11 +38,16 @@ class AuthService {
         return (data['details'] as List).join('\n');
       }
       throw Exception(data['error'] ?? 'Signup failed');
+
     }
+  } catch(e) {
+    throw Exception(_handleError(e));
+  }
   }
 
   /// Login with username and password
   static Future<String> login(String username, String password) async {
+    try {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/login'),
       headers: {'Content-Type': 'application/json'},
@@ -49,10 +65,13 @@ class AuthService {
       }
       throw Exception(data['error'] ?? data['message'] ?? 'Login failed');
     }
+  } catch(e) {
+    throw Exception(_handleError(e));
+  }
   }
 
-
   static Future<void> deleteAccount() async {
+    try {
     final token = await TokenStorage.readToken();
     final response = await http.delete(
       Uri.parse('$baseUrl/auth/delete'),
@@ -65,11 +84,14 @@ class AuthService {
       final data = jsonDecode(response.body);
       throw Exception(data['error'] ?? 'Failed to delete account');
     }
+  } catch(e) {
+    throw Exception(_handleError(e));
+  }
   }
 
-
-    // ── Get profile by ID ──────────────────────────────────
+  // ── Get profile by ID ──────────────────────────────────
   static Future<Map<String, dynamic>> getProfile(int userId) async {
+    try {
     final token = await TokenStorage.readToken();
     final response = await http.get(
       Uri.parse('$baseUrl/profile/$userId'),
@@ -83,6 +105,9 @@ class AuthService {
       return data;
     }
     throw Exception(data['error'] ?? 'Failed to fetch profile');
+  } catch(e) {
+    throw Exception(_handleError(e));
+  }
   }
 
   // ── Update profile ─────────────────────────────────────
@@ -92,6 +117,7 @@ class AuthService {
     String? slogan,
     String? profilePicturePath, // local file path if picking image
   }) async {
+    try {
     final token = await TokenStorage.readToken();
     final request = http.MultipartRequest(
       'PUT',
@@ -108,7 +134,10 @@ class AuthService {
     }
     if (profilePicturePath != null) {
       request.files.add(
-        await http.MultipartFile.fromPath('profile_picture', profilePicturePath),
+        await http.MultipartFile.fromPath(
+          'profile_picture',
+          profilePicturePath,
+        ),
       );
     }
 
@@ -119,24 +148,28 @@ class AuthService {
     if (response.statusCode == 200) return data;
     if (response.statusCode == 409) throw Exception('Username already taken');
     throw Exception(data['error'] ?? 'Failed to update profile');
+  } catch(e) {
+    throw Exception(_handleError(e));
+  }
   }
 
   static Future<List<UserModel>> getAllUsers() async {
-  final token = await TokenStorage.readToken();
-  final response = await http.get(
-    Uri.parse('$baseUrl/users'),
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
-  );
-  if (response.statusCode == 200) {
-    final List<dynamic> data = jsonDecode(response.body);
-    return data.map((json) => UserModel.fromJson(json)).toList();
+    try {
+      final token = await TokenStorage.readToken();
+      final response = await http.get(
+        Uri.parse('$baseUrl/users'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        return data.map((json) => UserModel.fromJson(json)).toList();
+      }
+      throw Exception('Failed to fetch users');
+    } catch (e) {
+      throw Exception(_handleError(e));
+    }
   }
-  throw Exception('Failed to fetch users');
 }
-}
-
-
-

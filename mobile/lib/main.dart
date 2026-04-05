@@ -57,6 +57,6 @@ class _AppRouter extends ConsumerWidget {
     }
 
     // No token → go to signup
-    return const SignupScreen();
+    return const HomeScreen();
   }
 }

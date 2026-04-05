@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:yuchat/widgets/bottom_navbar.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
+import 'view_user_screen.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key});
@@ -27,12 +28,14 @@ class _UsersScreenState extends State<UsersScreen> {
     _fetchUsers();
   }
 
+  // In _fetchUsers() — data comes raw from API as List<Map<String,dynamic>>
   Future<void> _fetchUsers() async {
     try {
-      final data = await AuthService.getAllUsers();
+      final List<UserModel> users =
+          await AuthService.getAllUsers(); // ✅ already parsed
       setState(() {
-        _allUsers = data.map((u) => UserModel.fromJson(u)).toList();
-        _filteredUsers = _allUsers;
+        _allUsers = users;
+        _filteredUsers = users;
         _isLoading = false;
       });
     } catch (e) {
@@ -150,7 +153,18 @@ class _UsersScreenState extends State<UsersScreen> {
                       itemCount: _filteredUsers.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
-                        return _UserTile(user: _filteredUsers[index]);
+                        final user = _filteredUsers[index];
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ViewUserScreen(userId: user.id),
+                              ),
+                            );
+                          },
+                          child: _UserTile(user: user),
+                        );
                       },
                     ),
             ),

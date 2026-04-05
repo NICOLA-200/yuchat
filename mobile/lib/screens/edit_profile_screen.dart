@@ -104,7 +104,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 : const Text(
                     'Save',
                     style: TextStyle(
-                      color: Colors.deepPurple,
+                      color: Colors.black12,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -149,7 +149,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       decoration: const BoxDecoration(
-                        color: Colors.deepPurple,
+                        color: Colors.black12,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),

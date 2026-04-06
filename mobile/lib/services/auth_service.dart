@@ -174,4 +174,12 @@ class AuthService {
       throw Exception(_handleError(e));
     }
   }
+
+
+
+  // services/auth_service.dart
+static String getRoomId(int myId, int otherUserId) {
+  final ids = [myId, otherUserId]..sort();
+  return '${ids[0]}_${ids[1]}';
+}
 }

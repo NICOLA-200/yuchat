@@ -42,12 +42,14 @@ class _UsersScreenState extends State<UsersScreen> {
     try {
       final List<UserModel> users =
           await AuthService.getAllUsers(); // ✅ already parsed
+           if (!mounted) return;
       setState(() {
         _allUsers = users;
         _filteredUsers = users;
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _error = e.toString();
         _isLoading = false;
@@ -185,48 +187,93 @@ class _UsersScreenState extends State<UsersScreen> {
   }
 }
 
-class _UserTile extends StatelessWidget {
+
+
+
+class _UserTile extends ConsumerWidget {
   final UserModel user;
   const _UserTile({required this.user});
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          // Avatar
-          CircleAvatar(
-            radius: 26,
-            backgroundColor: Colors.grey.shade300,
-            backgroundImage: user.avatarUrl != null
-                ? NetworkImage(user.avatarUrl!)
-                : null,
-            child: user.avatarUrl == null
-                ? Icon(Icons.person, color: Colors.grey.shade500, size: 28)
-                : null,
+          // ── Avatar → view profile ──────────────────
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ViewUserScreen(userId: user.id),
+                ),
+              );
+            },
+            child: CircleAvatar(
+              radius: 26,
+              backgroundColor: Colors.grey.shade300,
+              backgroundImage: user.avatarUrl != null
+                  ? NetworkImage(user.avatarUrl!)
+                  : null,
+              child: user.avatarUrl == null
+                  ? Icon(Icons.person,
+                      color: Colors.grey.shade500, size: 28)
+                  : null,
+            ),
           ),
+
           const SizedBox(width: 14),
-          // Name
+
+          // ── Name → view profile ────────────────────
           Expanded(
-            child: Text(
-              user.name,
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF2D2D2D),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ViewUserScreen(userId: user.id),
+                  ),
+                );
+              },
+              child: Text(
+                user.name,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF2D2D2D),
+                ),
               ),
             ),
           ),
-          // Message button
+
+          // ── Message button → chat ──────────────────
           ElevatedButton(
             onPressed: () {
-              // Navigate to chat with this user
+              final token = ref.read(authTokenProvider);
+              if (token == null || token.isEmpty) return;
+
+              final decoded = JwtDecoder.decode(token);
+              final myId = (decoded['user_id'] as num).toInt();
+              final ids = [myId, user.id]..sort();
+              final roomId = '${ids[0]}_${ids[1]}';
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ChatScreen(
+                    otherUser: user,
+                    roomId: roomId,
+                  ),
+                ),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF3D3D3D),
               foregroundColor: Colors.white,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),

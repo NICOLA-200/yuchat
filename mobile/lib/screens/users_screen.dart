@@ -5,8 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:yuchat/widgets/bottom_navbar.dart';
 import '../models/user.dart';
 import '../services/auth_service.dart';
+import '../services/auth_provider.dart';
 import 'view_user_screen.dart';
 import '../utils/network_utils.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:yuchat/screens/chat_screen.dart';
+import 'package:yuchat/screens/view_user_screen.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({super.key});
@@ -42,7 +48,7 @@ class _UsersScreenState extends State<UsersScreen> {
     try {
       final List<UserModel> users =
           await AuthService.getAllUsers(); // ✅ already parsed
-           if (!mounted) return;
+      if (!mounted) return;
       setState(() {
         _allUsers = users;
         _filteredUsers = users;
@@ -164,18 +170,7 @@ class _UsersScreenState extends State<UsersScreen> {
                       itemCount: _filteredUsers.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 8),
                       itemBuilder: (context, index) {
-                        final user = _filteredUsers[index];
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ViewUserScreen(userId: user.id),
-                              ),
-                            );
-                          },
-                          child: _UserTile(user: user),
-                        );
+                        return _UserTile(user: _filteredUsers[index]);
                       },
                     ),
             ),
@@ -186,9 +181,6 @@ class _UsersScreenState extends State<UsersScreen> {
     );
   }
 }
-
-
-
 
 class _UserTile extends ConsumerWidget {
   final UserModel user;
@@ -217,8 +209,7 @@ class _UserTile extends ConsumerWidget {
                   ? NetworkImage(user.avatarUrl!)
                   : null,
               child: user.avatarUrl == null
-                  ? Icon(Icons.person,
-                      color: Colors.grey.shade500, size: 28)
+                  ? Icon(Icons.person, color: Colors.grey.shade500, size: 28)
                   : null,
             ),
           ),
@@ -261,10 +252,7 @@ class _UserTile extends ConsumerWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ChatScreen(
-                    otherUser: user,
-                    roomId: roomId,
-                  ),
+                  builder: (_) => ChatScreen(otherUser: user, roomId: roomId),
                 ),
               );
             },
@@ -272,8 +260,7 @@ class _UserTile extends ConsumerWidget {
               backgroundColor: const Color(0xFF3D3D3D),
               foregroundColor: Colors.white,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(15),
               ),

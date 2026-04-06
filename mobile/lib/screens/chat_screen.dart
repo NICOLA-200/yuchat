@@ -36,47 +36,56 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 
   void _connect() {
-    final token = ref.read(authTokenProvider);
-    if (token == null || token.isEmpty) return;
+  final token = ref.read(authTokenProvider);
+  if (token == null || token.isEmpty) return;
 
-    final decoded = JwtDecoder.decode(token);
-    _myId = (decoded['user_id'] as num).toInt();
+  final decoded = JwtDecoder.decode(token);
+  _myId = (decoded['user_id'] as num).toInt();
 
-    final uri = Uri.parse(
-      'ws://192.168.1.69:8080/ws/${widget.roomId}?token=$token',
-    );
+  final uri = Uri.parse(
+    'ws://192.168.1.69:8080/ws/${widget.roomId}?token=$token',
+  );
 
-    _channel = WebSocketChannel.connect(uri);
+  _channel = WebSocketChannel.connect(uri);
 
-    _channel!.stream.listen(
-      (raw) {
-        final data = jsonDecode(raw as String);
-        if (!mounted) return;
-        setState(() {
-          _messages.add(_ChatMessage(
-            content: data['content'] ?? '',
-            senderID: data['sender_id'] ?? 0,
-            senderName: data['sender_name'] ?? '',
-            isMe: (data['sender_id'] ?? 0) == _myId,
-          ));
-        });
-        _scrollToBottom();
-      },
-      onError: (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Connection error: $e'), backgroundColor: Colors.red),
-        );
-      },
-      onDone: () {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Disconnected'), backgroundColor: Colors.grey),
-        );
-      },
-    );
-  }
-
+  _channel!.stream.listen(
+    (raw) {
+      if (!mounted) return; // ✅ guard
+      final data = jsonDecode(raw as String);
+      setState(() {
+        _messages.add(_ChatMessage(
+          content: data['content'] ?? '',
+          senderID: data['sender_id'] ?? 0,
+          senderName: data['sender_name'] ?? '',
+          isMe: (data['sender_id'] ?? 0) == _myId,
+        ));
+      });
+      _scrollToBottom();
+    },
+    onError: (e) {
+      if (!mounted) return; // ✅ guard
+      // Use a local variable to avoid context across async gap
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text('Connection error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    },
+    onDone: () {
+      if (!mounted) return; // ✅ guard
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Disconnected'),
+          backgroundColor: Colors.grey,
+        ),
+      );
+    },
+    cancelOnError: false,
+  );
+}
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isEmpty || _channel == null) return;

@@ -40,6 +40,10 @@ func AuthRequired() gin.HandlerFunc {
         userID := uint(claims["user_id"].(float64)) // JWT numbers are float64 by default
         c.Set("user_id", userID)
 
+        if username, ok := claims["username"].(string); ok {
+        c.Set("username", username)
+        }
+
         c.Next()
     }
 }

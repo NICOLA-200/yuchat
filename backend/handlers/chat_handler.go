@@ -26,19 +26,24 @@ var upgrader = websocket.Upgrader{
 func ChatHandler(c *gin.Context) {
 	roomID := c.Param("roomID")
 	userID := c.GetUint("user_id")
-	username, _ := c.Get("username")
 
-	// Upgrade HTTP → WebSocket
+	// Safe username extraction — won't panic if missing
+	username := "unknown"
+	if u, exists := c.Get("username"); exists {
+		if name, ok := u.(string); ok {
+			username = name
+		}
+	}
+
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		log.Println("[ws] upgrade error:", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to upgrade connection"})
 		return
 	}
 
 	client := &hub.Client{
 		ID:     userID,
-		Name:   username.(string),
+		Name:   username,
 		RoomID: roomID,
 		Conn:   conn,
 		Send:   make(chan []byte, 256),
@@ -47,7 +52,6 @@ func ChatHandler(c *gin.Context) {
 
 	hub.H.Register <- client
 
-	// Run read and write in separate goroutines
 	go client.WritePump()
 	go client.ReadPump()
 }

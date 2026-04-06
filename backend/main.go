@@ -8,6 +8,7 @@ import (
 	"yuchat/backend/middleware"
 	"github.com/gin-gonic/gin"
 	"yuchat/backend/db"
+	"yuchat/backend/hub"
 	_ "yuchat/backend/docs"
 	ginSwagger "github.com/swaggo/gin-swagger"
     "github.com/swaggo/files"

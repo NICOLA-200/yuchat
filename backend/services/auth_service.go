@@ -142,3 +142,15 @@ func (s *AuthService) GetAllUsers() ([]models.User, error) {
 
 	return users, err
 }
+
+
+func (s *AuthService) DeleteAccount(userID uint) error {
+    result := db.DB.Delete(&models.User{}, userID)
+    if result.Error != nil {
+        return result.Error
+    }
+    if result.RowsAffected == 0 {
+        return errors.New("user not found")
+    }
+    return nil
+}

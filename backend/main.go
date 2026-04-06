@@ -8,6 +8,7 @@ import (
 	"yuchat/backend/middleware"
 	"github.com/gin-gonic/gin"
 	"yuchat/backend/db"
+	"yuchat/backend/hub"
 	_ "yuchat/backend/docs"
 	ginSwagger "github.com/swaggo/gin-swagger"
     "github.com/swaggo/files"
@@ -53,7 +54,8 @@ func main() {
 	log.Println("Database migrated successfully")
 
 	r := gin.Default()
-
+	go hub.H.Run() 
+    r.GET("/ws/:roomID", middleware.AuthRequired(), handlers.ChatHandler)
 	api := r.Group("/api")
     // After auth group
     profile := api.Group("/profile")
@@ -67,6 +69,7 @@ func main() {
     }
     
 	api.GET("/users", handlers.GetAllUsers) 
+	
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":   "Hello from Gin + GORM + PostgreSQL!",

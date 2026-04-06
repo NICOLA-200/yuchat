@@ -53,7 +53,8 @@ func main() {
 	log.Println("Database migrated successfully")
 
 	r := gin.Default()
-
+	go hub.H.Run() 
+    r.GET("/ws/:roomID", middleware.AuthRequired(), handlers.ChatHandler)
 	api := r.Group("/api")
     // After auth group
     profile := api.Group("/profile")
@@ -67,7 +68,7 @@ func main() {
     }
     
 	api.GET("/users", handlers.GetAllUsers) 
-	api.GET("/ws/:roomID", middleware.AuthRequired(), handlers.ChatHandler)
+	
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message":   "Hello from Gin + GORM + PostgreSQL!",

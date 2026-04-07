@@ -58,6 +58,7 @@ func main() {
 	go hub.H.Run() 
     r.GET("/ws/:roomID", middleware.AuthRequired(), handlers.ChatHandler)
 	r.GET("/messages/:roomID", middleware.AuthRequired(), handlers.GetMessages)
+	r.GET("/conversations", middleware.AuthRequired(), handlers.GetConversations)
 	api := r.Group("/api")
     // After auth group
     profile := api.Group("/profile")

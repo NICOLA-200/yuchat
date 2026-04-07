@@ -182,4 +182,20 @@ static String getRoomId(int myId, int otherUserId) {
   final ids = [myId, otherUserId]..sort();
   return '${ids[0]}_${ids[1]}';
 }
+
+
+static Future<List<dynamic>> getConversations() async {
+  final token = await TokenStorage.readToken();
+  final response = await http.get(
+    Uri.parse('$baseUrl/conversations'),
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+  );
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body) as List<dynamic>;
+  }
+  throw Exception(_handleError('Failed to fetch conversations'));
+}
 }

@@ -145,7 +145,7 @@ func (c *Client) ReadPump() {
 			SenderName: c.Name,
 			RoomID:     c.RoomID,
 			Content:    incoming.Content,
-			CreatedAt:  timeNow(),
+			
 		}
 
 		c.Hub.Broadcast <- msg

@@ -6,6 +6,8 @@ import 'package:yuchat/models/user.dart';
 import 'package:yuchat/services/auth_provider.dart';
 import 'dart:convert';
 import 'package:yuchat/screens/view_user_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:developer';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final UserModel otherUser;
@@ -29,11 +31,37 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   WebSocketChannel? _channel;
   int _myId = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _connect();
+@override
+void initState() {
+  super.initState();
+  _loadHistory();
+  _connect();
+}
+
+Future<void> _loadHistory() async {
+  try {
+    final token = ref.read(authTokenProvider);
+    final response = await http.get(
+      Uri.parse('http://192.168.1.69:8080/messages/${widget.roomId}'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (!mounted) return;
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      setState(() {
+        _messages.addAll(data.map((m) => _ChatMessage(
+          content: m['content'] ?? '',
+          senderID: m['sender_id'] ?? 0,
+          senderName: m['sender_name'] ?? '',
+          isMe: (m['sender_id'] ?? 0) == _myId,
+        )));
+      });
+      _scrollToBottom();
+    }
+  } catch (e) {
+    log('failed to load history: $e');
   }
+}
 
   void _connect() {
   final token = ref.read(authTokenProvider);

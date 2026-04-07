@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:yuchat/screens/conversation_screen.dart';
 import 'package:yuchat/screens/home_screen.dart';
 import 'package:yuchat/screens/loading_screen.dart';
 import 'package:yuchat/screens/login_screen.dart';
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
       ),
       routes: {
         '/home':     (context) => const UsersScreen(),
-        '/chat':     (context) => const UsersScreen(),
+        '/chat':     (context) => const ChatsScreen(),
         '/profile':  (context) => const ProfileScreen(),
         '/signup':   (context) => const SignupScreen(),
         '/login':    (context) => const LoginScreen(),

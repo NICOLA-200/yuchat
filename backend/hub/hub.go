@@ -7,6 +7,7 @@ import (
     "time"
 	"github.com/gorilla/websocket"
 	"yuchat/backend/models"
+	"yuchat/backend/services"
 )
 
 // Client represents a single connected WebSocket user
@@ -90,6 +91,7 @@ func (h *Hub) Run() {
 					h.mu.Unlock()
 				}
 			}
+			go services.Message.Save(msg)
 		}
 	}
 }

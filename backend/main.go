@@ -46,6 +46,7 @@ func main() {
 
 	err := db.DB.AutoMigrate(
 		&models.User{},
+		&models.Message{},
 		// &models.OtherModel{},  ← add more later
 	)
 	if err != nil {
@@ -56,6 +57,7 @@ func main() {
 	r := gin.Default()
 	go hub.H.Run() 
     r.GET("/ws/:roomID", middleware.AuthRequired(), handlers.ChatHandler)
+	r.GET("/messages/:roomID", middleware.AuthRequired(), handlers.GetMessages)
 	api := r.Group("/api")
     // After auth group
     profile := api.Group("/profile")

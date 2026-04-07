@@ -6,6 +6,22 @@ import '../models/user.dart';
 import 'dart:io';
 
 class AuthService {
+
+  static Future<bool> isTokenExpired() async {
+  try {
+    final token = await TokenStorage.readToken();
+    if (token == null || token.isEmpty) return true;
+    
+    // Check if token is expired
+    bool isExpired = JwtDecoder.isExpired(token);
+    return isExpired;
+  } catch (e) {
+    // If any error occurs (invalid token format, etc.), treat as expired
+    return true;
+  }
+}
+
+
   // Add this helper inside AuthService:
   static String _handleError(dynamic e) {
     if (e is SocketException)

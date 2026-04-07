@@ -145,13 +145,9 @@ class _ChatsScreenState extends ConsumerState<ChatsScreen> {
                                           builder: (_) => ChatScreen(
                                             roomId: c['room_id'],
                                             otherUser: UserModel(
-                                              id: c['other_user_id'],
-                                              name: c['other_user_name'],
-                                              avatarUrl: c['other_user_picture']
-                                                          ?.isNotEmpty ==
-                                                      true
-                                                  ? c['other_user_picture']
-                                                  : null,
+                                              id: c['sender_id'],
+                                              name: c['sender_name'],
+                                              avatarUrl: null,
                                             ),
                                           ),
                                         ),
@@ -182,12 +178,11 @@ class _ConversationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String name = conversation['other_user_name'] ?? '';
-    final String lastMsg = conversation['last_message'] ?? '';
+    final String name = conversation['sender_name'] ?? '';
+    final String lastMsg = conversation['content'] ?? '';
     final bool isMe = conversation['is_me'] ?? false;
-    final String? picture = conversation['other_user_picture'];
-    final DateTime? sentAt = conversation['last_message_at'] != null
-        ? DateTime.tryParse(conversation['last_message_at'])
+    final DateTime? sentAt = conversation['created_at'] != null
+        ? DateTime.tryParse(conversation['created_at'])
         : null;
 
     return InkWell(
@@ -197,18 +192,17 @@ class _ConversationTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            // Avatar
+            // Avatar - using initials
             CircleAvatar(
               radius: 28,
               backgroundColor: Colors.grey.shade200,
-              backgroundImage:
-                  picture != null && picture.isNotEmpty
-                      ? NetworkImage(picture)
-                      : null,
-              child: picture == null || picture.isEmpty
-                  ? Icon(Icons.person,
-                      size: 28, color: Colors.grey.shade400)
-                  : null,
+              child: Text(
+                name.isNotEmpty ? name[0].toUpperCase() : '?',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1A1A1A),
+                ),
+              ),
             ),
 
             const SizedBox(width: 14),

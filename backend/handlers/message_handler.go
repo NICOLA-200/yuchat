@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"yuchat/backend/services"
+	"yuchat/backend/models"
 )
 
 // GetMessages godoc
@@ -35,4 +36,30 @@ func GetMessages(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, messages)
+}
+
+
+// GetConversations godoc
+// @Summary      Get recent conversations
+// @Description  Returns last 20 people the logged-in user chatted with + last message
+// @Tags         messages
+// @Security     BearerAuth
+// @Success      200  {array}   models.ConversationPreview
+// @Failure      500  {object}  map[string]string
+// @Router       /conversations [get]
+func GetConversations(c *gin.Context) {
+	userID := c.GetUint("user_id")
+
+	previews, err := services.Message.GetRecentConversations(userID, 20)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch conversations"})
+		return
+	}
+
+	// Return empty array not null if no conversations yet
+	if previews == nil {
+		previews = []models.ConversationPreview{}
+	}
+
+	c.JSON(http.StatusOK, previews)
 }

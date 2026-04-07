@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:yuchat/screens/conversation_screen.dart';
 import 'package:yuchat/screens/home_screen.dart';
 import 'package:yuchat/screens/loading_screen.dart';
@@ -9,6 +10,7 @@ import 'package:yuchat/screens/signup_screen.dart';
 import 'package:yuchat/screens/users_screen.dart';
 import 'package:yuchat/screens/settings_screen.dart';
 import 'package:yuchat/services/auth_provider.dart';
+import 'package:yuchat/services/token_storage.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -52,8 +54,22 @@ class _AppRouter extends ConsumerWidget {
       return const LoadingScreen();
     }
 
-    // Token exists → go to app
+    // Token exists → check if expired
     if (token.isNotEmpty) {
+      // Check if token is expired
+      if (JwtDecoder.isExpired(token)) {
+        // Token expired - clear it and redirect to login
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          await TokenStorage.deleteToken();
+          await ref.read(authTokenProvider.notifier).clearToken();
+          if (context.mounted) {
+            Navigator.of(context).pushReplacementNamed('/login');
+          }
+        });
+        return const LoadingScreen();
+      }
+      
+      // Token is valid - go to app
       return const UsersScreen();
     }
 

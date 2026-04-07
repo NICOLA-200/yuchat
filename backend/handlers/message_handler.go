@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"yuchat/backend/services"
-	"yuchat/backend/models"
+	
 )
 
 // GetMessages godoc
@@ -56,9 +56,8 @@ func GetConversations(c *gin.Context) {
 		return
 	}
 
-	// Return empty array not null if no conversations yet
 	if previews == nil {
-		previews = []models.ConversationPreview{}
+		previews = []map[string]interface{}{}
 	}
 
 	c.JSON(http.StatusOK, previews)

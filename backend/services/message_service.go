@@ -4,6 +4,8 @@ import (
 	"log"
 	"yuchat/backend/db"
 	"yuchat/backend/models"
+	"fmt"
+	"time"
 )
 
 type MessageService struct{}
@@ -27,39 +29,20 @@ func (s *MessageService) GetByRoom(roomID string, limit int) ([]models.Message, 
 }
 
 
-
-func (s *MessageService) GetRecentConversations(userID uint, limit int) ([]models.ConversationPreview, error) {
-	// Get the most recent message per room where this user participated
+func (s *MessageService) GetRecentConversations(userID uint, limit int) ([]map[string]interface{}, error) {
 	rows, err := db.DB.Raw(`
-		SELECT DISTINCT ON (m.room_id)
-			m.room_id,
-			m.sender_id,
-			m.sender_name,
-			m.content    AS last_message,
-			m.created_at AS last_message_at,
-			u.id         AS other_user_id,
-			u.username   AS other_user_name,
-			u.profile_picture AS other_user_picture
-		FROM messages m
-		JOIN users u ON (
-			CASE
-				WHEN m.sender_id = ? THEN
-					u.id = CAST(
-						CASE
-							WHEN split_part(m.room_id, '_', 1) = CAST(? AS TEXT)
-							THEN split_part(m.room_id, '_', 2)
-							ELSE split_part(m.room_id, '_', 1)
-						END
-					AS INTEGER)
-				ELSE u.id = m.sender_id
-			END
-		)
-		WHERE m.room_id LIKE ? OR m.room_id LIKE ?
-		  AND m.deleted_at IS NULL
-		ORDER BY m.room_id, m.created_at DESC
+		SELECT DISTINCT ON (room_id)
+			room_id,
+			sender_id,
+			sender_name,
+			content,
+			created_at
+		FROM messages
+		WHERE (room_id LIKE ? OR room_id LIKE ?)
+		  AND deleted_at IS NULL
+		ORDER BY room_id, created_at DESC
 		LIMIT ?
 	`,
-		userID, userID,
 		fmt.Sprintf("%d_%%", userID),
 		fmt.Sprintf("%%_%d", userID),
 		limit,
@@ -70,25 +53,26 @@ func (s *MessageService) GetRecentConversations(userID uint, limit int) ([]model
 	}
 	defer rows.Close()
 
-	var previews []models.ConversationPreview
+	var results []map[string]interface{}
 	for rows.Next() {
-		var p models.ConversationPreview
-		if err := rows.Scan(
-			&p.RoomID,
-			&p.SenderID,
-			&p.SenderName,
-			&p.LastMessage,
-			&p.LastMessageAt,
-			&p.OtherUserID,
-			&p.OtherUserName,
-			&p.OtherUserPicture,
-		); err != nil {
+		var roomID, senderName, content string
+		var senderID uint
+		var createdAt time.Time
+
+		if err := rows.Scan(&roomID, &senderID, &senderName, &content, &createdAt); err != nil {
 			log.Println("[message] scan error:", err)
 			continue
 		}
-		p.IsMe = p.SenderID == userID
-		previews = append(previews, p)
+
+		results = append(results, map[string]interface{}{
+			"room_id":      roomID,
+			"sender_id":    senderID,
+			"sender_name":  senderName,
+			"content":      content,
+			"created_at":   createdAt,
+			"is_me":        senderID == userID,
+		})
 	}
 
-	return previews, nil
+	return results, nil
 }

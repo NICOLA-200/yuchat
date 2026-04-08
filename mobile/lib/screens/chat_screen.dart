@@ -76,6 +76,7 @@ Future<void> _loadHistory() async {
 
   _channel = WebSocketChannel.connect(uri);
 
+  final messenger = ScaffoldMessenger.of(context);
   _channel!.stream.listen(
     (raw) {
       if (!mounted) return; // ✅ guard
@@ -93,7 +94,7 @@ Future<void> _loadHistory() async {
     onError: (e) {
       if (!mounted) return; // ✅ guard
       // Use a local variable to avoid context across async gap
-      final messenger = ScaffoldMessenger.of(context);
+      
       messenger.showSnackBar(
         SnackBar(
           content: Text('Connection error: $e'),

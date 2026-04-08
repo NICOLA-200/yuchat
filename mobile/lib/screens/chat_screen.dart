@@ -152,16 +152,16 @@ void _connect() {
         title: Row(
           children: [
             // Avatar
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: Colors.grey.shade200,
-              backgroundImage: widget.otherUser.avatarUrl != null
-                  ? NetworkImage(widget.otherUser.avatarUrl!)
-                  : null,
-              child: widget.otherUser.avatarUrl == null
-                  ? Icon(Icons.person, size: 20, color: Colors.grey.shade400)
-                  : null,
-            ),
+            // CircleAvatar(
+            //   radius: 18,
+            //   backgroundColor: Colors.grey.shade200,
+            //   backgroundImage: widget.otherUser.avatarUrl != null
+            //       ? NetworkImage(widget.otherUser.avatarUrl!)
+            //       : null,
+            //   child: widget.otherUser.avatarUrl == null
+            //       ? Icon(Icons.person, size: 20, color: Colors.grey.shade400)
+            //       : null,
+            // ),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +175,7 @@ void _connect() {
                   ),
                 ),
                 const Text(
-                  'Active now',
+                  'chat with',
                   style: TextStyle(
                     color: Colors.grey,
                     fontSize: 11,

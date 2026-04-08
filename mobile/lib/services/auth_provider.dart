@@ -9,7 +9,7 @@ class AuthTokenNotifier extends Notifier<String?> {
   @override
   String? build() {
     _loadToken();
-    return '__loading__'; // distinct from null and ""
+    return null; // distinct from null and ""
   }
 
   Future<void> _loadToken() async {

@@ -54,26 +54,19 @@ class _AppRouter extends ConsumerWidget {
       return const LoadingScreen();
     }
 
-    // Token exists → check if expired
+    // has a token → validate it
     if (token.isNotEmpty) {
-      // Check if token is expired
-      if (JwtDecoder.isExpired(token)) {
-        // Token expired - clear it and redirect to login
+      // ✅ guard before decoding — must have 3 parts to be a real JWT
+      if (token.split('.').length != 3 || JwtDecoder.isExpired(token)) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
-          await TokenStorage.deleteToken();
           await ref.read(authTokenProvider.notifier).clearToken();
-          if (context.mounted) {
-            Navigator.of(context).pushReplacementNamed('/login');
-          }
         });
-        return const LoadingScreen();
+        return const HomeScreen();
       }
-      
-      // Token is valid - go to app
       return const UsersScreen();
     }
 
-    // No token → go to signup
+    // empty string = logged out
     return const HomeScreen();
   }
 }

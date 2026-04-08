@@ -35,9 +35,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 void initState() {
   super.initState();
   _loadHistory();
-  _connect();
+  
 }
-
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  // ✅ Only connect once
+  if (_channel == null) {
+    _connect();
+  }
+}
 Future<void> _loadHistory() async {
   try {
     final token = ref.read(authTokenProvider);
@@ -63,7 +70,7 @@ Future<void> _loadHistory() async {
   }
 }
 
-  void _connect() {
+void _connect() {
   final token = ref.read(authTokenProvider);
   if (token == null || token.isEmpty) return;
 
@@ -76,10 +83,9 @@ Future<void> _loadHistory() async {
 
   _channel = WebSocketChannel.connect(uri);
 
-  final messenger = ScaffoldMessenger.of(context);
   _channel!.stream.listen(
     (raw) {
-      if (!mounted) return; // ✅ guard
+      if (!mounted) return;
       final data = jsonDecode(raw as String);
       setState(() {
         _messages.add(_ChatMessage(
@@ -92,29 +98,18 @@ Future<void> _loadHistory() async {
       _scrollToBottom();
     },
     onError: (e) {
-      if (!mounted) return; // ✅ guard
-      // Use a local variable to avoid context across async gap
-      
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text('Connection error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      // ✅ No ScaffoldMessenger — just log it
+      debugPrint('[chat] connection error: $e');
     },
     onDone: () {
-      if (!mounted) return; // ✅ guard
-      final messenger = ScaffoldMessenger.of(context);
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Disconnected'),
-          backgroundColor: Colors.grey,
-        ),
-      );
+      // ✅ No ScaffoldMessenger — just log it
+      debugPrint('[chat] websocket closed');
     },
     cancelOnError: false,
   );
 }
+
+
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isEmpty || _channel == null) return;

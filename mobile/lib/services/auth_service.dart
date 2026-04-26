@@ -18,7 +18,7 @@ class AuthService {
 
   // Change this to your backend server URL
   static const String baseUrl =
-      'http://192.168.1.69:8080/api'; // Android emulator
+      'https://yuchatbackend.fatepepe66.workers.dev/api'; // Android emulator
   // For iOS simulator or physical device, use: 'http://localhost:8080' or your machine IP
 
   /// Sign up with username and password

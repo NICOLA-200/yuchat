@@ -3,7 +3,8 @@ package db
 import (
 	"fmt"
 	"log"
-	
+	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,38 +13,50 @@ import (
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	// ────────────────────────────────────────────────
-	// Change these values to match YOUR local PostgreSQL
-	// ────────────────────────────────────────────────
-	host     := "localhost"
-	port     := 5432
-	user     := "postgres"          // ← your postgres username
-	password := "12345"     // ← your password
-	dbname   := "yuchat"            // ← create this database first!
+	host := getEnv("DB_HOST", "localhost")
+	port := getEnv("DB_PORT", "5432")
+	user := getEnv("DB_USER", "postgres")
+	password := getEnv("DB_PASSWORD", "12345")
+	dbname := getEnv("DB_NAME", "yuchat")
 
-	// Recommended connection string format
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=UTC",
-		host, user, password, dbname, port)
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
+		host, user, password, dbname, port,
+	)
 
-	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		// Good defaults for development
-		PrepareStmt:            true,   // prepared statements = safer + faster
-		SkipDefaultTransaction: false,  // usually keep transactions on
-	})
+	var database *gorm.DB
+	var err error
 
-	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+	// Retry logic (because Postgres takes its sweet time)
+	for i := 0; i < 10; i++ {
+		database, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+			PrepareStmt:            true,
+			SkipDefaultTransaction: false,
+		})
+
+		if err == nil {
+			break
+		}
+
+		log.Println("Database not ready yet... retrying in 2s")
+		time.Sleep(2 * time.Second)
 	}
 
-	fmt.Println("Database connection successful! 🚀")
+	if err != nil {
+		log.Fatalf("Failed to connect to database after retries: %v", err)
+	}
 
-	// Optional: print actual used driver version (pgx)
+	fmt.Println("Database connection successful 🚀")
+
 	sqlDB, _ := database.DB()
-	log.Printf("PostgreSQL driver (pgx) stats: %v open connections", sqlDB.Stats().OpenConnections)
+	log.Printf("Open connections: %d", sqlDB.Stats().OpenConnections)
 
 	DB = database
+}
 
-	// Optional: AutoMigrate your models later (uncomment when you have models)
-	// DB.AutoMigrate(&User{}, &Product{}, ...)
-	
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }

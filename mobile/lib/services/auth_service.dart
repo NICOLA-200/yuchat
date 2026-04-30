@@ -6,8 +6,6 @@ import '../models/user.dart';
 import 'dart:io';
 
 class AuthService {
-
-  
   // Add this helper inside AuthService:
   static String _handleError(dynamic e) {
     if (e is SocketException)
@@ -16,100 +14,99 @@ class AuthService {
     return e.toString().replaceAll('Exception: ', '');
   }
 
-  // Change this to your backend server URL
+  // Change this to your backend server URLPz
   static const String baseUrl =
-      'https://yuchatbackend.fatepepe66.workers.dev/api'; // Android emulator
+      'https://yuchat-backend-production.up.railway.app/api'; // Android emulator
   // For iOS simulator or physical device, use: 'http://localhost:8080' or your machine IP
 
   /// Sign up with username and password
   static Future<String> signup(String username, String password) async {
     try {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/signup'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'username': username, 'password': password}),
-    );
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/signup'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': username, 'password': password}),
+      );
 
-    final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-    if (response.statusCode == 201) {
-      return data['message'] ?? 'Account created successfully';
-    } else {
-      // Handle structured backend errors
-      if (data['details'] != null) {
-        return (data['details'] as List).join('\n');
+      if (response.statusCode == 201) {
+        return data['message'] ?? 'Account created successfully';
+      } else {
+        // Handle structured backend errors
+        if (data['details'] != null) {
+          return (data['details'] as List).join('\n');
+        }
+        throw Exception(data['error'] ?? 'Signup failed');
       }
-      throw Exception(data['error'] ?? 'Signup failed');
-
+    } catch (e) {
+      throw Exception(_handleError(e));
     }
-  } catch(e) {
-    throw Exception(_handleError(e));
-  }
   }
 
   /// Login with username and password
   static Future<String> login(String username, String password) async {
     try {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'username': username, 'password': password}),
-    );
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'username': username, 'password': password}),
+      );
 
-    final data = jsonDecode(response.body);
+      final data = jsonDecode(response.body);
 
-    if (response.statusCode == 200) {
-      return data['access_token'] ?? data['data']?['token'] ?? '';
-    } else {
-      // Handle structured backend errors the same way as signup
-      if (data['details'] != null) {
-        throw Exception((data['details'] as List).join('\n'));
+      if (response.statusCode == 200) {
+        return data['access_token'] ?? data['data']?['token'] ?? '';
+      } else {
+        // Handle structured backend errors the same way as signup
+        if (data['details'] != null) {
+          throw Exception((data['details'] as List).join('\n'));
+        }
+        throw Exception(data['error'] ?? data['message'] ?? 'Login failed');
       }
-      throw Exception(data['error'] ?? data['message'] ?? 'Login failed');
+    } catch (e) {
+      throw Exception(_handleError(e));
     }
-  } catch(e) {
-    throw Exception(_handleError(e));
-  }
   }
 
   static Future<void> deleteAccount() async {
     try {
-    final token = await TokenStorage.readToken();
-    final response = await http.delete(
-      Uri.parse('$baseUrl/auth/delete'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    if (response.statusCode != 200) {
-      final data = jsonDecode(response.body);
-      throw Exception(data['error'] ?? 'Failed to delete account');
+      final token = await TokenStorage.readToken();
+      final response = await http.delete(
+        Uri.parse('$baseUrl/auth/delete'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.statusCode != 200) {
+        final data = jsonDecode(response.body);
+        throw Exception(data['error'] ?? 'Failed to delete account');
+      }
+    } catch (e) {
+      throw Exception(_handleError(e));
     }
-  } catch(e) {
-    throw Exception(_handleError(e));
-  }
   }
 
   // ── Get profile by ID ──────────────────────────────────
   static Future<Map<String, dynamic>> getProfile(int userId) async {
     try {
-    final token = await TokenStorage.readToken();
-    final response = await http.get(
-      Uri.parse('$baseUrl/profile/$userId'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    final data = jsonDecode(response.body);
-    if (response.statusCode == 200) {
-      return data;
+      final token = await TokenStorage.readToken();
+      final response = await http.get(
+        Uri.parse('$baseUrl/profile/$userId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      final data = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        return data;
+      }
+      throw Exception(data['error'] ?? 'Failed to fetch profile');
+    } catch (e) {
+      throw Exception(_handleError(e));
     }
-    throw Exception(data['error'] ?? 'Failed to fetch profile');
-  } catch(e) {
-    throw Exception(_handleError(e));
-  }
   }
 
   // ── Update profile ─────────────────────────────────────
@@ -120,44 +117,42 @@ class AuthService {
     String? profilePicturePath, // local file path if picking image
   }) async {
     try {
-    final token = await TokenStorage.readToken();
-    final request = http.MultipartRequest(
-      'PUT',
-      Uri.parse('$baseUrl/profile/$userId'),
-    );
-
-    request.headers['Authorization'] = 'Bearer $token';
-
-    if (username != null && username.isNotEmpty) {
-      request.fields['username'] = username;
-    }
-    if (slogan != null && slogan.isNotEmpty) {
-      request.fields['slogan'] = slogan;
-    }
-    if (profilePicturePath != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'profile_picture',
-          profilePicturePath,
-        ),
+      final token = await TokenStorage.readToken();
+      final request = http.MultipartRequest(
+        'PUT',
+        Uri.parse('$baseUrl/profile/$userId'),
       );
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      if (username != null && username.isNotEmpty) {
+        request.fields['username'] = username;
+      }
+      if (slogan != null && slogan.isNotEmpty) {
+        request.fields['slogan'] = slogan;
+      }
+      if (profilePicturePath != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'profile_picture',
+            profilePicturePath,
+          ),
+        );
+      }
+
+      final streamed = await request.send();
+      final response = await http.Response.fromStream(streamed);
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) return data;
+      if (response.statusCode == 409) throw Exception('Username already taken');
+      throw Exception(data['error'] ?? 'Failed to update profile');
+    } catch (e) {
+      throw Exception(_handleError(e));
     }
-
-    final streamed = await request.send();
-    final response = await http.Response.fromStream(streamed);
-    final data = jsonDecode(response.body);
-
-    if (response.statusCode == 200) return data;
-    if (response.statusCode == 409) throw Exception('Username already taken');
-    throw Exception(data['error'] ?? 'Failed to update profile');
-  } catch(e) {
-    throw Exception(_handleError(e));
-  }
   }
 
   static Future<List<UserModel>> getAllUsers() async {
-
-    
     try {
       final token = await TokenStorage.readToken();
       final response = await http.get(
@@ -177,27 +172,24 @@ class AuthService {
     }
   }
 
-
-
   // services/auth_service.dart
-static String getRoomId(int myId, int otherUserId) {
-  final ids = [myId, otherUserId]..sort();
-  return '${ids[0]}_${ids[1]}';
-}
-
-
-static Future<List<dynamic>> getConversations() async {
-  final token = await TokenStorage.readToken();
-  final response = await http.get(
-    Uri.parse('$baseUrl/conversations'),
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
-    },
-  );
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body) as List<dynamic>;
+  static String getRoomId(int myId, int otherUserId) {
+    final ids = [myId, otherUserId]..sort();
+    return '${ids[0]}_${ids[1]}';
   }
-  throw Exception(_handleError('Failed to fetch conversations'));
-}
+
+  static Future<List<dynamic>> getConversations() async {
+    final token = await TokenStorage.readToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/conversations'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as List<dynamic>;
+    }
+    throw Exception(_handleError('Failed to fetch conversations'));
+  }
 }

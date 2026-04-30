@@ -49,7 +49,7 @@ Future<void> _loadHistory() async {
   try {
     final token = ref.read(authTokenProvider);
     final response = await http.get(
-      Uri.parse('http://192.168.1.69:8080/messages/${widget.roomId}'),
+      Uri.parse('https://yuchat-backend-production.up.railway.app/messages/${widget.roomId}'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (!mounted) return;
@@ -78,7 +78,7 @@ void _connect() {
   _myId = (decoded['user_id'] as num).toInt();
 
   final uri = Uri.parse(
-    'ws://192.168.1.69:8080/ws/${widget.roomId}?token=$token',
+    'wss://yuchat-backend-production.up.railway.app/ws/${widget.roomId}?token=$token',
   );
 
   _channel = WebSocketChannel.connect(uri);
